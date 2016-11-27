@@ -17,6 +17,10 @@ set options to use in analysis (this step is optional)
     - type: Number
     - default: `null`
     - description: Limit number of files to output analysis of, sorted by DESC size
+  - **root** - *optional*
+    - type: String
+    - default: `process.cwd()`
+    - description: Application directory, used to display file paths relatively
 
 ### formatted(bundle)
 returns Promise which resolves with well formatted analysis string (for CLI printing)
