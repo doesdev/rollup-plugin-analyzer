@@ -6,6 +6,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 const buf = ' ';
 const tab = '  ';
 const borderX = `${Array(30).join('-')}\n`;
+let proc = process;
+let root = proc && proc.cwd ? proc.cwd() : null;
 let limit;
 
 // Helpers
@@ -22,6 +24,7 @@ const formatBytes = (bytes) => {
 function init (opts) {
   opts = opts || {};
   limit = opts.limit;
+  root = opts.root || root;
 }
 
 function formatted (bndl) { return analyze(bndl, true) }
@@ -30,9 +33,9 @@ function analyze (bundle, format) {
   let deps = {};
   return new Promise((resolve, reject) => {
     let modules = bundle.modules.map((m, i) => {
-      let id = m.id.replace(__dirname, '');
+      let id = m.id.replace(root, '');
       m.dependencies.forEach((d) => {
-        d = d.replace(__dirname, '');
+        d = d.replace(root, '');
         deps[d] = deps[d] || [];
         deps[d].push(id);
       });
@@ -49,7 +52,7 @@ function analyze (bundle, format) {
       formatted += `size:${buf}${formatBytes(m.size)}\n`;
       formatted += `dependents:${buf}${m.dependents.length}\n`;
       m.dependents.forEach((d) => {
-        formatted += `${tab}-${buf}${d.replace(__dirname, '')}\n`;
+        formatted += `${tab}-${buf}${d.replace(root, '')}\n`;
       });
       formatted += `${borderX}`;
     });
