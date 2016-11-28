@@ -15,7 +15,7 @@ const formatBytes = (bytes) => {
   if (bytes === 0) return '0 Byte'
   let k = 1000;
   let dm = 3;
-  let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  let sizes = ['Bytes', 'KB', 'MB', 'GB'];
   let i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 };
@@ -31,25 +31,33 @@ function formatted (bndl) { return analyze(bndl, true) }
 
 function analyze (bundle, format) {
   let deps = {};
+  let bundleSize = 0;
   return new Promise((resolve, reject) => {
     let modules = bundle.modules.map((m, i) => {
       let id = m.id.replace(root, '');
+      let size = Buffer.byteLength(m.code, 'utf8') || 0;
+      bundleSize += size;
       m.dependencies.forEach((d) => {
         d = d.replace(root, '');
         deps[d] = deps[d] || [];
         deps[d].push(id);
       });
-      return {id, size: Buffer.byteLength(m.code, 'utf8') || 0}
+      return {id, size}
     });
     modules.sort((a, b) => b.size - a.size);
     if (limit) modules = modules.slice(0, limit);
-    modules.forEach((m) => { m.dependents = deps[m.id] || []; });
+    modules.forEach((m) => {
+      m.dependents = deps[m.id] || [];
+      m.percent = ((m.size / bundleSize) * 100).toFixed(2);
+    });
     if (!format) return resolve(modules)
-    let heading = `Rollup file analysis\n`;
-    let formatted = `${borderX}${heading}${borderX}`;
+    let heading = `Rollup File Analysis\n`;
+    let displaySize = `${borderX}bundle size: ${formatBytes(bundleSize)}\n`;
+    let formatted = `${borderX}${heading}${displaySize}${borderX}`;
     modules.forEach((m) => {
       formatted += `file:${buf}${m.id}\n`;
       formatted += `size:${buf}${formatBytes(m.size)}\n`;
+      formatted += `percent:${buf}${m.percent}%\n`;
       formatted += `dependents:${buf}${m.dependents.length}\n`;
       m.dependents.forEach((d) => {
         formatted += `${tab}-${buf}${d.replace(root, '')}\n`;

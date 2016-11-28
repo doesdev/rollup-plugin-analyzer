@@ -44,18 +44,21 @@ rollup.rollup({/*...*/}).then((bundle) => {
 // Results in ...
 /*
 -----------------------------
-Rollup file analysis
+Rollup File Analysis
+-----------------------------
+bundle size: 1.146 MB
 -----------------------------
 file: \node_modules\html5-history-api\history.js
 size: 38.502 KB
+percent: 3.36%
 dependents: 1
   - \app\modules\page.js
 -----------------------------
 file: \node_modules\pikaday\pikaday.js
 size: 34.683 KB
+percent: 3.03%
 dependents: 1
   - \app\helpers\transformer.js
------------------------------
 ...
 */
 ```
