@@ -1,7 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 // Setup
 const buf = ' ';
 const tab = '  ';
@@ -9,6 +7,7 @@ const borderX = `${Array(30).join('-')}\n`;
 let proc = process;
 let root = proc && proc.cwd ? proc.cwd() : null;
 let limit;
+let filter;
 
 // Helpers
 const formatBytes = (bytes) => {
@@ -24,8 +23,17 @@ const formatBytes = (bytes) => {
 function init (opts) {
   opts = opts || {};
   limit = opts.limit;
+  filter = opts.filter;
   root = opts.root || root;
 }
+
+function analyzer$1 (opts) {
+  init(opts);
+  return {init, formatted, analyze}
+}
+analyzer$1.init = init;
+analyzer$1.formatted = formatted;
+analyzer$1.analyze = analyze;
 
 function formatted (bndl) { return analyze(bndl, true) }
 
@@ -37,13 +45,15 @@ function analyze (bundle, format) {
       let id = m.id.replace(root, '');
       let size = Buffer.byteLength(m.code, 'utf8') || 0;
       bundleSize += size;
+      if (Array.isArray(filter) && !filter.some((f) => id.match(f))) return null
+      if (filter && !id.match(filter)) return null
       m.dependencies.forEach((d) => {
         d = d.replace(root, '');
         deps[d] = deps[d] || [];
         deps[d].push(id);
       });
       return {id, size}
-    });
+    }).filter((m) => m);
     modules.sort((a, b) => b.size - a.size);
     if (limit) modules = modules.slice(0, limit);
     modules.forEach((m) => {
@@ -68,6 +78,4 @@ function analyze (bundle, format) {
   })
 }
 
-exports.init = init;
-exports.analyze = analyze;
-exports.formatted = formatted;
+module.exports = analyzer$1;
