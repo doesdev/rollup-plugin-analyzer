@@ -1,15 +1,16 @@
 {
   "name": "rollup-analyzer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Analyze file sizes of rollup bundled imports",
   "main": "index.js",
-  "jsnext:main": "index-es6.js",
+  "module": "module.js",
   "files": [
     "index.js",
-    "index-es6.js"
+    "module.js"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "precommit": "rollup -c && git add index.js"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,9 @@
     "bundle",
     "file",
     "size",
-    "analysis"
+    "analysis",
+    "analyze",
+    "bloat"
   ],
   "author": "Andrew Carpenter (https://github.com/doesdev)",
   "license": "MIT",
@@ -30,13 +33,8 @@
   },
   "homepage": "https://github.com/doesdev/rollup-analyzer#readme",
   "devDependencies": {
-    "ghooks": "^1.3.2",
-    "rollup": "^0.36.4",
-    "simple-git": "^1.63.0"
-  },
-  "config": {
-    "ghooks": {
-      "pre-commit": "node build"
-    }
+    "husky": "^0.14.3",
+    "rollup": "^0.47.6",
+    "rollup-analyzer-plugin": "^1.0.0"
   }
 }

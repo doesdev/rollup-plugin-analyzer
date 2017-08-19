@@ -2,42 +2,31 @@
 
 > Analyze file sizes of rollup bundled imports
 
-## install
+## rollup-analyzer
+
+Rollup Analyzer gives you a quick look at what's taking up space in your bundle.
+
+### Comes in three scrumptious flavors:
+
+#### [rollup-analyzer-plugin](https://github.com/doesdev/rollup-analyzer-plugin)
+Adding as a plugin to your rollup config or build script will print a well
+formatted analysis to the console upon bundling.
+
+#### [rollup-analyzer-config](https://github.com/doesdev/rollup-analyzer-config)
+If using Rollup's CLI to bundle with no additonal config, pass
+`-c node:rollup-analyzer-config` to print a well formatted analysis to your console.
+
+#### [rollup-analyzer](https://github.com/doesdev/rollup-analyzer)
+Full analysis module, giving you access to the complete analysis object or well
+formatted analysis text for CI and build usage.
+
+## Install
 
 ```sh
 $ npm install --save-dev rollup-analyzer
 ```
 
-## api
-
-### rollupAnalyzer
-the default exported function is identical to init, and returns the same functions as export {init, formatted, analyze}. So, you can `require('rollup-analyzer')` or `require('rollup-analyzer')({limit: 5})` and use the same functions.
-
-### rollupAnalyzer.init(options)
-set options to use in analysis (this step is optional)
-- **options** *(Object)*
-  - **limit** - *optional*
-    - type: Number
-    - default: `null`
-    - description: Limit number of files to output analysis of, sorted by DESC size
-  - **filter** - *optional*
-    - type: Array | String
-    - default: `null`
-    - description: Filter to only show imports matching the specified name(s)
-  - **root** - *optional*
-    - type: String
-    - default: `process.cwd()`
-    - description: Application directory, used to display file paths relatively
-
-### rollupAnalyzer.formatted(bundle)
-returns Promise which resolves with well formatted analysis string (for CLI printing)
-- **bundle** *(Rollup Bundle)* - *required*
-
-### rollupAnalyzer.analyze(bundle)
-returns Promise which resolves with array of objects describing each imported file
-- **bundle** *(Rollup Bundle)* - *required*
-
-## usage
+## Usage
 
 ```js
 const rollupAnalyzer = require('rollup-analyzer')({limit: 5})
@@ -67,6 +56,35 @@ dependents: 1
 ...
 */
 ```
+
+## API
+
+### rollupAnalyzer
+the default exported function is identical to init, and returns the same functions as export {init, formatted, analyze}. So, you can `require('rollup-analyzer')` or `require('rollup-analyzer')({limit: 5})` and use the same functions.
+
+### rollupAnalyzer.init(options)
+set options to use in analysis (this step is optional)
+- **options** *(Object)*
+  - **limit** - *optional*
+    - type: Number
+    - default: `null`
+    - description: Limit number of files to output analysis of, sorted by DESC size
+  - **filter** - *optional*
+    - type: Array | String
+    - default: `null`
+    - description: Filter to only show imports matching the specified name(s)
+  - **root** - *optional*
+    - type: String
+    - default: `process.cwd()`
+    - description: Application directory, used to display file paths relatively
+
+### rollupAnalyzer.formatted(bundle)
+returns Promise which resolves with well formatted analysis string (for CLI printing)
+- **bundle** *(Rollup Bundle)* - *required*
+
+### rollupAnalyzer.analyze(bundle)
+returns Promise which resolves with array of objects describing each imported file
+- **bundle** *(Rollup Bundle)* - *required*
 
 ## License
 
