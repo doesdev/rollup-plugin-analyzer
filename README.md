@@ -86,6 +86,12 @@ returns Promise which resolves with well formatted analysis string (for CLI prin
 returns Promise which resolves with array of objects describing each imported file
 - **bundle** *(Rollup Bundle)* - *required*
 
+returned array's child analysis objects have the following properties
+- **id** *(String)* - path of module / rollup module id
+- **size** *(Number)* - size of module in bytes
+- **dependents** *(Array)* - list of dependent module ids / paths
+- **percent** *(Number)* - percentage of module size relative to entire bundle
+
 ## License
 
 MIT © [Andrew Carpenter](https://github.com/doesdev)

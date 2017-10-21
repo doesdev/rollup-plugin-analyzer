@@ -48,7 +48,7 @@ function analyze (bundle, format) {
       let size = Buffer.byteLength(m.code, 'utf8') || 0
       bundleSize += size
       if (Array.isArray(filter) && !filter.some((f) => id.match(f))) return null
-      if (filter && !id.match(filter)) return null
+      else if (typeof filter === 'string' && !id.match(filter)) return null
       m.dependencies.forEach((d) => {
         d = d.replace(root, '')
         deps[d] = deps[d] || []
@@ -57,7 +57,7 @@ function analyze (bundle, format) {
       return {id, size}
     }).filter((m) => m)
     modules.sort((a, b) => b.size - a.size)
-    if (limit) modules = modules.slice(0, limit)
+    if (limit || limit === 0) modules = modules.slice(0, limit)
     modules.forEach((m) => {
       m.dependents = deps[m.id] || []
       m.percent = ((m.size / bundleSize) * 100).toFixed(2)
