@@ -1,15 +1,12 @@
 'use strict';
 
-'use strict';
-
 // Setup
 const buf = ' ';
 const tab = '  ';
 const borderX = `${Array(30).join('-')}\n`;
 let proc = process;
 let root = proc && proc.cwd ? proc.cwd() : null;
-let limit;
-let filter;
+let limit, filter;
 
 // Helpers
 const formatBytes = (bytes) => {
@@ -29,13 +26,13 @@ function init (opts) {
   root = opts.root || root;
 }
 
-function analyzer$1 (opts) {
+function analyzer (opts) {
   init(opts);
   return {init, formatted, analyze}
 }
-analyzer$1.init = init;
-analyzer$1.formatted = formatted;
-analyzer$1.analyze = analyze;
+analyzer.init = init;
+analyzer.formatted = formatted;
+analyzer.analyze = analyze;
 
 function formatted (bndl) { return analyze(bndl, true) }
 
@@ -80,4 +77,4 @@ function analyze (bundle, format) {
   })
 }
 
-module.exports = analyzer$1;
+module.exports = analyzer;

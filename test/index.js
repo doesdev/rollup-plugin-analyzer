@@ -3,16 +3,17 @@
 // setup
 import test from 'ava'
 import { rollup } from 'rollup'
-import analyzer, { init, formatted, analyze } from './index'
+import analyzer, { init, formatted, analyze } from './../index'
 const baseOpts = {
   input: 'module.js',
   output: {format: 'cjs'}
 }
-let bundle
+let bundle, bundleToo
 
 // create the bundle
 test.before(async () => {
   bundle = await rollup(baseOpts)
+  bundleToo = await rollup({input: 'test/_bundleme.js', output: {format: 'cjs'}})
 })
 
 // main
@@ -87,4 +88,10 @@ test(`root works as expected`, async (assert) => {
     'module.js'
   )
   init({root: undefined})
+})
+
+test.failing(`tree shaking is accounted for`, async (assert) => {
+  let results = await analyze(bundleToo)
+  let imported = results.find((r) => r.id.match('importme'))
+  assert.is(imported.size, 4)
 })
