@@ -67,7 +67,7 @@ rollers.forEach(({rollup, version, opts}) => {
     assert.true('percent' in result)
   })
 
-  test(`${version}: limit works and opts are set the same via init or analyzer`, async (assert) => {
+  test(`${version}: limit works, opts are set via init or analyzer`, async (assert) => {
     let bundle = await rollup(opts)
     init({limit: 0})
     assert.is((await analyze(bundle)).length, 0)
