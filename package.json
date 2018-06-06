@@ -35,7 +35,12 @@
   "devDependencies": {
     "ava": "^0.25.0",
     "husky": "^0.14.3",
-    "rollup": "^0.56.5"
+    "rollup": "latest",
+    "rollup40": "npm:rollup@0.40.x",
+    "rollup45": "npm:rollup@0.45.x",
+    "rollup50": "npm:rollup@0.50.x",
+    "rollup55": "npm:rollup@0.55.x",
+    "rollup59": "npm:rollup@0.59.x"
   },
   "dependencies": {}
 }
