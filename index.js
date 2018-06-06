@@ -39,8 +39,10 @@ function formatted (bndl) { return analyze(bndl, true) }
 function analyze (bundle, format) {
   let deps = {};
   let bundleSize = 0;
+  // console.log(bundle)
   return new Promise((resolve, reject) => {
     let modules = bundle.modules.map((m, i) => {
+      console.log(Object.assign({}, m, {code: 'redacted', originalCode: 'redacted'}));
       let id = m.id.replace(root, '');
       let size = Buffer.byteLength(m.code, 'utf8') || 0;
       bundleSize += size;
