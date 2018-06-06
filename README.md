@@ -1,4 +1,4 @@
-# rollup-analyzer [![NPM version](https://badge.fury.io/js/rollup-analyzer.svg)](https://npmjs.org/package/rollup-analyzer)   [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)   [![Dependency Status](https://dependencyci.com/github/doesdev/rollup-analyzer/badge)](https://dependencyci.com/github/doesdev/rollup-analyzer)   [![Build Status](https://travis-ci.org/doesdev/rollup-analyzer.svg)](https://travis-ci.org/doesdev/rollup-analyzer)  
+# rollup-analyzer [![NPM version](https://badge.fury.io/js/rollup-analyzer.svg)](https://npmjs.org/package/rollup-analyzer)   [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)   [![Dependency Status](https://dependencyci.com/github/doesdev/rollup-analyzer/badge)](https://dependencyci.com/github/doesdev/rollup-analyzer)   [![Build Status](https://travis-ci.com/doesdev/rollup-analyzer.svg)](https://travis-ci.com/doesdev/rollup-analyzer)  
 
 > Analyze file sizes of rollup bundled imports
 
