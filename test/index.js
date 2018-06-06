@@ -3,6 +3,7 @@
 // setup
 import test from 'ava'
 import { rollup } from 'rollup'
+// import { rollup as rollup59 } from 'rollup59'
 import analyzer, { init, formatted, analyze } from './../index'
 const baseOpts = {
   input: 'module.js',
@@ -13,7 +14,7 @@ let bundle, bundleToo
 // create the bundle
 test.before(async () => {
   bundle = await rollup(baseOpts)
-  bundleToo = await rollup({input: 'test/_bundleme.js', output: {format: 'cjs'}})
+  bundleToo = await rollup({input: 'test/fixtures/bundle.js', output: {format: 'cjs'}})
 })
 
 // main
