@@ -24,6 +24,7 @@ const expectHeader = `
 Rollup File Analysis
 -----------------------------
 `.trim()
+const headerLength = expectHeader.length
 
 // test against many versions of rollup
 const rollers = [
@@ -37,10 +38,10 @@ const rollers = [
 
 // main
 rollers.forEach(({rollup, version, opts, noTreeshake}) => {
-  test(`${version}: formatted returns string`, async (assert) => {
+  test(`${version}: formatted returns expected string`, async (assert) => {
     let bundle = await rollup(opts)
     let results = await formatted(bundle)
-    assert.is(typeof results, 'string')
+    assert.is(results.substr(0, headerLength), expectHeader)
   })
 
   test(`${version}: analyze returns array`, async (assert) => {
