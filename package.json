@@ -1,6 +1,6 @@
 {
   "name": "rollup-analyzer",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "Analyze file sizes of rollup bundled imports",
   "main": "index.js",
   "module": "module.js",

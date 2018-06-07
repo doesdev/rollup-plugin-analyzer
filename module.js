@@ -28,7 +28,10 @@ export const analyze = (bundle, opts = {}, format = false) => {
 
     let modules = bundleModules.map((m, i) => {
       let id = m.id.replace(root, '')
-      let size = m.renderedLength || Buffer.byteLength(m.code, 'utf8') || 0
+      let size = m.renderedLength
+      if (!size && size !== 0) {
+        size = m.code ? Buffer.byteLength(m.code, 'utf8') : 0
+      }
       bundleSize += size
 
       if (Array.isArray(filter) && !filter.some((f) => id.match(f))) return null
