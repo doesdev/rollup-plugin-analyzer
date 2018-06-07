@@ -22,8 +22,8 @@ const analyze = (bundle, opts = {}, format = false) => {
 
   return new Promise((resolve, reject) => {
     if (bundleModules && !Array.isArray(bundleModules)) {
-      bundleModules = Object.entries(bundleModules).map(([id, obj]) => {
-        let { originalLength, renderedLength } = obj;
+      bundleModules = Object.keys(bundleModules).map((id) => {
+        let { originalLength, renderedLength } = bundleModules[id];
         return {id, dependencies: [], originalLength, renderedLength}
       });
     }
