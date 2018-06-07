@@ -29,14 +29,14 @@ Rollup File Analysis
 const rollers = [
   {rollup: rollupLatest, version: 'latest', opts: baseOpts},
   {rollup: rollup60, version: '0.60.x', opts: baseOpts},
-  {rollup: rollup55, version: '0.55.x', opts: baseOpts},
-  {rollup: rollup50, version: '0.50.x', opts: baseOpts},
-  {rollup: rollup45, version: '0.45.x', opts: oldOpts},
-  {rollup: rollup40, version: '0.40.x', opts: oldOpts}
+  {rollup: rollup55, version: '0.55.x', opts: baseOpts, noTreeshake: true},
+  {rollup: rollup50, version: '0.50.x', opts: baseOpts, noTreeshake: true},
+  {rollup: rollup45, version: '0.45.x', opts: oldOpts, noTreeshake: true},
+  {rollup: rollup40, version: '0.40.x', opts: oldOpts, noTreeshake: true}
 ]
 
 // main
-rollers.forEach(({rollup, version, opts}) => {
+rollers.forEach(({rollup, version, opts, noTreeshake}) => {
   test(`${version}: formatted returns string`, async (assert) => {
     let bundle = await rollup(opts)
     let results = await formatted(bundle)
@@ -96,9 +96,7 @@ rollers.forEach(({rollup, version, opts}) => {
     assert.is(typeof results, 'string')
   })
 
-  let shouldFailPlugin = {latest: true, '0.60.x': true}
-  let pluginTest = shouldFailPlugin[version] ? test.failing : test
-  pluginTest(`${version}: plugin writes expected results`, async (assert) => {
+  test(`${version}: plugin writes expected results`, async (assert) => {
     let results
     let writeTo = (r) => { results = r }
     let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, opts)
@@ -107,10 +105,15 @@ rollers.forEach(({rollup, version, opts}) => {
     assert.is(results.substr(0, expectHeader.length), expectHeader)
   })
 
-  test.failing(`${version}: tree shaking is accounted for`, async (assert) => {
-    let bundle = await rollup(opts)
-    let results = await analyze(bundle)
-    let imported = results.find((r) => r.id.match('importme'))
-    assert.is(imported.size, 4)
-  })
+  if (!noTreeshake) {
+    test(`${version}: tree shaking is accounted for`, async (assert) => {
+      let results
+      let onAnalysis = (r) => { results = r }
+      let rollOpts = Object.assign({plugins: [plugin({onAnalysis})]}, opts)
+      let bundle = await rollup(rollOpts)
+      await bundle.generate({format: 'cjs'})
+      let imported = results.find((r) => r.id.indexOf('import-a') !== -1)
+      assert.is(imported.size, 27)
+    })
+  }
 })

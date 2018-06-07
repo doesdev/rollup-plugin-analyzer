@@ -16,11 +16,19 @@ export const analyze = (bundle, opts = {}, format = false) => {
   let { root, limit, filter } = opts
   let deps = {}
   let bundleSize = 0
+  let bundleModules = bundle.modules
 
   return new Promise((resolve, reject) => {
-    let modules = bundle.modules.map((m, i) => {
+    if (bundleModules && !Array.isArray(bundleModules)) {
+      bundleModules = Object.entries(bundleModules).map(([id, obj]) => {
+        let { originalLength, renderedLength } = obj
+        return {id, dependencies: [], originalLength, renderedLength}
+      })
+    }
+
+    let modules = bundleModules.map((m, i) => {
       let id = m.id.replace(root, '')
-      let size = Buffer.byteLength(m.code, 'utf8') || 0
+      let size = m.renderedLength || Buffer.byteLength(m.code, 'utf8') || 0
       bundleSize += size
 
       if (Array.isArray(filter) && !filter.some((f) => id.match(f))) return null
@@ -66,11 +74,19 @@ export const analyze = (bundle, opts = {}, format = false) => {
 export const formatted = (bndl, opts) => analyze(bndl, opts, true)
 
 export const plugin = (opts = {}) => {
-  let log = opts.writeTo || (opts.stdout ? console.log : console.error)
+  let cb = opts.writeTo || (opts.stdout ? console.log : console.error)
+  if (opts.onAnalysis) cb = opts.onAnalysis
+  let written
+
+  let runAnalysis = (outputOptions, bundle, isWrite) => {
+    if (written) return
+    if (outputOptions.bundle) bundle = outputOptions.bundle
+    written = true
+    return analyze(bundle, opts, !opts.onAnalysis).then(cb)
+  }
   return {
     name: 'rollup-analyzer-plugin',
-    ongenerate: ({bundle}) => {
-      return formatted(bundle, opts).then(log)
-    }
+    generateBundle: runAnalysis,
+    ongenerate: runAnalysis
   }
 }
