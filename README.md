@@ -29,10 +29,12 @@ $ npm install --save-dev rollup-analyzer
 ## Usage
 
 ```js
-const rollupAnalyzer = require('rollup-analyzer')({limit: 5})
-rollup.rollup({/*...*/}).then((bundle) => {
+import { rollup } from 'rollup'
+const { formatted } from 'rollup-analyzer'
+
+rollup({/*...*/}).then((bundle) => {
   // print console optimized analysis string
-  rollupAnalyzer.formatted(bundle).then(console.log).catch(console.error)
+  formatted(bundle, {limit: 5}).then(console.log).catch(console.error)
 })
 
 // Results in ...
@@ -59,12 +61,27 @@ dependents: 1
 
 ## API
 
-### rollupAnalyzer
-the default exported function is identical to init, and returns the same functions as export {init, formatted, analyze}. So, you can `require('rollup-analyzer')` or `require('rollup-analyzer')({limit: 5})` and use the same functions.
+Module exports `analyze`, `formatted`, and `plugin` functions
 
-### rollupAnalyzer.init(options)
-set options to use in analysis (this step is optional)
-- **options** *(Object)*
+### formatted(bundle, options)
+- arguments
+  - **bundle** *(Rollup Bundle)*
+  - **options** *(Object - see below for available options)*
+- returns
+  - **analysisText** *(String - well formatted for console printing)*
+
+### analyze(bundle, options)
+- arguments
+  - **bundle** *(Rollup Bundle)*
+  - **options** *(Object - see below for available options)*
+- returns
+  - **analysis** *(Object)*
+    - **id** *(String)* - path of module / rollup module id
+    - **size** *(Number)* - size of module in bytes
+    - **dependents** *(Array)* - list of dependent module ids / paths
+    - **percent** *(Number)* - percentage of module size relative to entire bundle
+
+#### options `Object`
   - **limit** - *optional*
     - type: Number
     - default: `null`
@@ -77,20 +94,6 @@ set options to use in analysis (this step is optional)
     - type: String
     - default: `process.cwd()`
     - description: Application directory, used to display file paths relatively
-
-### rollupAnalyzer.formatted(bundle)
-returns Promise which resolves with well formatted analysis string (for CLI printing)
-- **bundle** *(Rollup Bundle)* - *required*
-
-### rollupAnalyzer.analyze(bundle)
-returns Promise which resolves with array of objects describing each imported file
-- **bundle** *(Rollup Bundle)* - *required*
-
-returned array's child analysis objects have the following properties
-- **id** *(String)* - path of module / rollup module id
-- **size** *(Number)* - size of module in bytes
-- **dependents** *(Array)* - list of dependent module ids / paths
-- **percent** *(Number)* - percentage of module size relative to entire bundle
 
 ## License
 

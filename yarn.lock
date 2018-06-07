@@ -58,8 +58,8 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
 
 "@types/node@*":
-  version "10.3.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.3.1.tgz#51092fbacaed768a122a293814474fbf6e5e8b6d"
+  version "10.3.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.3.2.tgz#3840ec6c12556fdda6e0e6d036df853101d732a4"
 
 abbrev@1:
   version "1.1.1"
@@ -1864,8 +1864,8 @@ p-finally@^1.0.0:
   resolved "https://registry.yarnpkg.com/p-finally/-/p-finally-1.0.0.tgz#3fbcfb15b899a44123b34b6dcc18b724336a2cae"
 
 p-limit@^1.1.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-1.2.0.tgz#0e92b6bedcb59f022c13d0f1949dc82d15909f1c"
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-1.3.0.tgz#b86bd5f0c25690911c7590fcbfc2010d54b3ccb8"
   dependencies:
     p-try "^1.0.0"
 
@@ -2239,16 +2239,16 @@ rimraf@^2.6.1:
   version "0.55.5"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.55.5.tgz#2f88c300f7cf24b5ec2dca8a6aba73b04e087e93"
 
-"rollup59@npm:rollup@0.59.x":
-  version "0.59.4"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.59.4.tgz#6f80f7017c22667ff1bf3e62adf8624a44cc44aa"
+"rollup60@npm:rollup@0.60.x":
+  version "0.60.0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.60.0.tgz#2c4acaaf3d8a858a81ff740d6253e21eeb58ff21"
   dependencies:
     "@types/estree" "0.0.39"
     "@types/node" "*"
 
-rollup@0.60.0:
-  version "0.60.0"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.60.0.tgz#2c4acaaf3d8a858a81ff740d6253e21eeb58ff21"
+rollup@^0.60.1:
+  version "0.60.1"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.60.1.tgz#07cb66153f1541d5f7e82b8393b405c31647dae9"
   dependencies:
     "@types/estree" "0.0.39"
     "@types/node" "*"
