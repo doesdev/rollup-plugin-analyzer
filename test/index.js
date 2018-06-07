@@ -2,6 +2,7 @@
 
 // setup
 import test from 'ava'
+import { analyze, formatted, plugin } from './../index'
 import { resolve, join } from 'path'
 import { rollup as rollupLatest } from 'rollup'
 import { rollup as rollup60 } from 'rollup60'
@@ -9,7 +10,6 @@ import { rollup as rollup55 } from 'rollup55'
 import { rollup as rollup50 } from 'rollup50'
 import { rollup as rollup45 } from 'rollup45'
 import { rollup as rollup40 } from 'rollup40'
-import { analyze, formatted } from './../index'
 const fixtures = resolve(__dirname, 'fixtures')
 const baseOpts = {
   input: join(fixtures, 'bundle.js'),
@@ -19,6 +19,11 @@ const oldOpts = {
   entry: join(fixtures, 'bundle.js'),
   format: 'cjs'
 }
+const expectHeader = `
+-----------------------------
+Rollup File Analysis
+-----------------------------
+`.trim()
 
 // test against many versions of rollup
 const rollers = [
@@ -89,6 +94,17 @@ rollers.forEach(({rollup, version, opts}) => {
     await bundle.generate({format: 'cjs'})
     let results = await formatted(bundle)
     assert.is(typeof results, 'string')
+  })
+
+  let shouldFailPlugin = {latest: true, '0.60.x': true}
+  let pluginTest = shouldFailPlugin[version] ? test.failing : test
+  pluginTest(`${version}: plugin writes expected results`, async (assert) => {
+    let results
+    let writeTo = (r) => { results = r }
+    let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, opts)
+    let bundle = await rollup(rollOpts)
+    await bundle.generate({format: 'cjs'})
+    assert.is(results.substr(0, expectHeader.length), expectHeader)
   })
 
   test.failing(`${version}: tree shaking is accounted for`, async (assert) => {

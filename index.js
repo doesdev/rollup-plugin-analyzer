@@ -67,5 +67,16 @@ const analyze = (bundle, opts = {}, format = false) => {
 
 const formatted = (bndl, opts) => analyze(bndl, opts, true);
 
+const plugin = (opts = {}) => {
+  let log = opts.writeTo || (opts.stdout ? console.log : console.error);
+  return {
+    name: 'rollup-analyzer-plugin',
+    ongenerate: ({bundle}) => {
+      return formatted(bundle, opts).then(log)
+    }
+  }
+};
+
 exports.analyze = analyze;
 exports.formatted = formatted;
+exports.plugin = plugin;

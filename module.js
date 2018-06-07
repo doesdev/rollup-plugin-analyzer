@@ -64,3 +64,13 @@ export const analyze = (bundle, opts = {}, format = false) => {
 }
 
 export const formatted = (bndl, opts) => analyze(bndl, opts, true)
+
+export const plugin = (opts = {}) => {
+  let log = opts.writeTo || (opts.stdout ? console.log : console.error)
+  return {
+    name: 'rollup-analyzer-plugin',
+    ongenerate: ({bundle}) => {
+      return formatted(bundle, opts).then(log)
+    }
+  }
+}
