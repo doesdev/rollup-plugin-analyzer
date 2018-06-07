@@ -40,7 +40,7 @@
     "rollup45": "npm:rollup@0.45.x",
     "rollup50": "npm:rollup@0.50.x",
     "rollup55": "npm:rollup@0.55.x",
-    "rollup59": "npm:rollup@0.59.x"
+    "rollup60": "npm:rollup@0.60.x"
   },
   "dependencies": {}
 }

@@ -4,7 +4,7 @@
 import test from 'ava'
 import { resolve, join } from 'path'
 import { rollup as rollupLatest } from 'rollup'
-import { rollup as rollup59 } from 'rollup59'
+import { rollup as rollup60 } from 'rollup60'
 import { rollup as rollup55 } from 'rollup55'
 import { rollup as rollup50 } from 'rollup50'
 import { rollup as rollup45 } from 'rollup45'
@@ -23,7 +23,7 @@ const oldOpts = {
 // test against many versions of rollup
 const rollers = [
   {rollup: rollupLatest, version: 'latest', opts: baseOpts},
-  {rollup: rollup59, version: '0.59.x', opts: baseOpts},
+  {rollup: rollup60, version: '0.60.x', opts: baseOpts},
   {rollup: rollup55, version: '0.55.x', opts: baseOpts},
   {rollup: rollup50, version: '0.50.x', opts: baseOpts},
   {rollup: rollup45, version: '0.45.x', opts: oldOpts},
@@ -82,6 +82,13 @@ rollers.forEach(({rollup, version, opts}) => {
       join(__dirname, (await analyze(bundle, {root: __dirname}))[0].id),
       resolve(fixtures, 'import-a.js')
     )
+  })
+
+  test(`${version}: it works with generated bundle as well`, async (assert) => {
+    let bundle = await rollup(opts)
+    await bundle.generate({format: 'cjs'})
+    let results = await formatted(bundle)
+    assert.is(typeof results, 'string')
   })
 
   test.failing(`${version}: tree shaking is accounted for`, async (assert) => {
