@@ -15,23 +15,17 @@ const formatBytes = (bytes) => {
 export const analyze = (bundle, opts = {}, format = false) => {
   let { root, limit, filter } = opts
   let deps = {}
+  let entrySize
   let bundleSize = 0
   let bundleModules = bundle.modules
 
   return new Promise((resolve, reject) => {
-    if (bundleModules && !Array.isArray(bundleModules)) {
-      bundleModules = Object.keys(bundleModules).map((id) => {
-        let { originalLength, renderedLength } = bundleModules[id]
-        return {id, dependencies: [], originalLength, renderedLength}
-      })
-    }
-
     let modules = bundleModules.map((m, i) => {
-      let id = m.id.replace(root, '')
-      let size = m.renderedLength
-      if (!size && size !== 0) {
-        size = m.code ? Buffer.byteLength(m.code, 'utf8') : 0
-      }
+      let { id, originalLength: origSize, renderedLength, isEntry, code } = m
+      id = id.replace(root, '')
+      let size = renderedLength
+      if (!size && size !== 0) size = code ? Buffer.byteLength(code, 'utf8') : 0
+      if (isEntry) entrySize = size
       bundleSize += size
 
       if (Array.isArray(filter) && !filter.some((f) => id.match(f))) return null
@@ -43,14 +37,17 @@ export const analyze = (bundle, opts = {}, format = false) => {
         deps[d].push(id)
       })
 
-      return {id, size}
+      return {id, size, origSize, isEntry}
     }).filter((m) => m)
+
+    if (entrySize) bundleSize = entrySize
 
     modules.sort((a, b) => b.size - a.size)
     if (limit || limit === 0) modules = modules.slice(0, limit)
     modules.forEach((m) => {
       m.dependents = deps[m.id] || []
       m.percent = ((m.size / bundleSize) * 100).toFixed(2)
+      m.reduction = 100 - ((m.size / m.origSize) * 100).toFixed(2)
     })
 
     if (!format) return resolve(modules)
@@ -60,9 +57,12 @@ export const analyze = (bundle, opts = {}, format = false) => {
     let formatted = `${borderX}${heading}${displaySize}${borderX}`
 
     modules.forEach((m) => {
+      if (m.isEntry) return
       formatted += `file:${buf}${m.id}\n`
       formatted += `size:${buf}${formatBytes(m.size)}\n`
       formatted += `percent:${buf}${m.percent}%\n`
+      formatted += `orig. size:${buf}${formatBytes(m.origSize || 'unknown')}\n`
+      formatted += `code reduction:${buf}${m.reduction}%\n`
       formatted += `dependents:${buf}${m.dependents.length}\n`
       m.dependents.forEach((d) => {
         formatted += `${tab}-${buf}${d.replace(root, '')}\n`
@@ -80,15 +80,39 @@ export const plugin = (opts = {}) => {
   let cb = opts.writeTo || (opts.stdout ? console.log : console.error)
   if (opts.onAnalysis) cb = opts.onAnalysis
   let written
+  let modules
 
-  let runAnalysis = (outputOptions, bundle, isWrite) => {
+  let runAnalysis = (out, bundle, isWrite) => new Promise((resolve, reject) => {
+    resolve()
     if (written) return
-    if (outputOptions.bundle) bundle = outputOptions.bundle
     written = true
-    return analyze(bundle, opts, !opts.onAnalysis).then(cb)
-  }
+    if (out.bundle) bundle = out.bundle
+    if (!Array.isArray(bundle.modules)) {
+      modules.forEach((m) => {
+        let bm = bundle.modules[m.id]
+        bm.id = bm.id || m.id
+        bm.isEntry = bm.isEntry || m.isEntry
+        bm.dependencies = m.dependencies || []
+      })
+      modules = Object.keys(bundle.modules).map((k) => bundle.modules[k])
+    } else {
+      modules = bundle.modules
+    }
+    return analyze({modules}, opts, !opts.onAnalysis).then(cb)
+  })
   return {
     name: 'rollup-analyzer-plugin',
+    transformChunk: (_a, _b, chunk) => new Promise((resolve, reject) => {
+      resolve(null)
+      if (!chunk || !chunk.orderedModules) return
+      modules = chunk.orderedModules.map((m) => {
+        return {
+          id: m.id,
+          isEntry: m.isEntryPoint,
+          dependencies: m.dependencies.map((d) => d.id)
+        }
+      })
+    }),
     generateBundle: runAnalysis,
     ongenerate: runAnalysis
   }
