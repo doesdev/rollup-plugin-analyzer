@@ -9,7 +9,7 @@ import { rollup as rollup55 } from 'rollup55'
 import { rollup as rollup50 } from 'rollup50'
 import { rollup as rollup45 } from 'rollup45'
 import { rollup as rollup40 } from 'rollup40'
-import analyzer, { init, formatted, analyze } from './../index'
+import { analyze, formatted } from './../index'
 const fixtures = resolve(__dirname, 'fixtures')
 const baseOpts = {
   input: join(fixtures, 'bundle.js'),
@@ -19,20 +19,6 @@ const oldOpts = {
   entry: join(fixtures, 'bundle.js'),
   format: 'cjs'
 }
-
-// general API conformity tests
-test(`analyzer returns {init, formatted, analyze}`, (assert) => {
-  assert.is(analyzer.init, init)
-  assert.is(analyzer.formatted, formatted)
-  assert.is(analyzer.analyze, analyze)
-})
-
-test(`analyzer() returns {init, formatted, analyze}`, (assert) => {
-  let optedAnalyzer = analyzer()
-  assert.is(optedAnalyzer.init, init)
-  assert.is(optedAnalyzer.formatted, formatted)
-  assert.is(optedAnalyzer.analyze, analyze)
-})
 
 // test against many versions of rollup
 const rollers = [
@@ -67,50 +53,35 @@ rollers.forEach(({rollup, version, opts}) => {
     assert.true('percent' in result)
   })
 
-  test(`${version}: limit works, opts are set via init or analyzer`, async (assert) => {
+  test(`${version}: limit works`, async (assert) => {
     let bundle = await rollup(opts)
-    init({limit: 0})
-    assert.is((await analyze(bundle)).length, 0)
-    init({limit: 1})
-    assert.is((await analyze(bundle)).length, 1)
-    analyzer({limit: 0})
-    assert.is((await analyze(bundle)).length, 0)
-    analyzer({limit: 1})
-    assert.is((await analyze(bundle)).length, 1)
-    init({limit: undefined})
+    assert.is((await analyze(bundle, {limit: 0})).length, 0)
+    assert.is((await analyze(bundle, {limit: 1})).length, 1)
+    assert.is((await analyze(bundle, {limit: 0})).length, 0)
   })
 
   test(`${version}: filter with array works`, async (assert) => {
     let bundle = await rollup(opts)
-    init({filter: ['jimmy', 'jerry']})
-    assert.is((await analyze(bundle)).length, 0)
-    init({filter: ['import-a', 'jessie']})
-    assert.is((await analyze(bundle)).length, 1)
-    init({filter: undefined})
+    assert.is((await analyze(bundle, {filter: ['jimmy', 'jerry']})).length, 0)
+    assert.is((await analyze(bundle, {filter: ['import-a', 'jessie']})).length, 1)
   })
 
   test(`${version}: filter with string works`, async (assert) => {
     let bundle = await rollup(opts)
-    init({filter: 'jimmy'})
-    assert.is((await analyze(bundle)).length, 0)
-    init({filter: 'import-b'})
-    assert.is((await analyze(bundle)).length, 1)
-    init({filter: undefined})
+    assert.is((await analyze(bundle, {filter: 'jimmy'})).length, 0)
+    assert.is((await analyze(bundle, {filter: 'import-b'})).length, 1)
   })
 
   test(`${version}: root works as expected`, async (assert) => {
     let bundle = await rollup(opts)
-    init({root: 'fakepath'})
     assert.not(
-      join(__dirname, (await analyze(bundle))[0].id),
+      join(__dirname, (await analyze(bundle, {root: 'fakepath'}))[0].id),
       resolve(fixtures, 'import-a.js')
     )
-    init({root: __dirname})
     assert.is(
-      join(__dirname, (await analyze(bundle))[0].id),
+      join(__dirname, (await analyze(bundle, {root: __dirname}))[0].id),
       resolve(fixtures, 'import-a.js')
     )
-    init({root: undefined})
   })
 
   test.failing(`${version}: tree shaking is accounted for`, async (assert) => {
