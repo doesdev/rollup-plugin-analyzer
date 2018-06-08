@@ -19,6 +19,7 @@
   "keywords": [
     "rollup",
     "plugin",
+    "config",
     "import",
     "bundle",
     "file",
@@ -27,6 +28,7 @@
     "metrics",
     "analysis",
     "analyze",
+    "analyzer",
     "bloat"
   ],
   "author": "Andrew Carpenter (https://github.com/doesdev)",

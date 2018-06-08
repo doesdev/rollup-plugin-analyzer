@@ -16,6 +16,7 @@ const formatBytes = (bytes) => {
 
 const analyze = (bundle, opts = {}, format = false) => {
   let { root, limit, filter } = opts;
+  root = root || (process && process.cwd ? process.cwd() : null);
   let deps = {};
   let entrySize;
   let bundleSize = 0;
