@@ -1,7 +1,7 @@
 {
-  "name": "rollup-analyzer",
-  "version": "2.0.0-beta.3",
-  "description": "Analyze file sizes of rollup bundled imports",
+  "name": "rollup-plugin-analyzer",
+  "version": "2.0.0",
+  "description": "Mad metrics for your rollup bundles, know all the things",
   "main": "index.js",
   "module": "module.js",
   "files": [
@@ -14,14 +14,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/doesdev/rollup-analyzer.git"
+    "url": "git+https://github.com/doesdev/rollup-plugin-analyzer.git"
   },
   "keywords": [
     "rollup",
+    "plugin",
     "import",
     "bundle",
     "file",
     "size",
+    "treeshaking",
+    "metrics",
     "analysis",
     "analyze",
     "bloat"
@@ -29,13 +32,13 @@
   "author": "Andrew Carpenter (https://github.com/doesdev)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/doesdev/rollup-analyzer/issues"
+    "url": "https://github.com/doesdev/rollup-plugin-analyzer/issues"
   },
-  "homepage": "https://github.com/doesdev/rollup-analyzer#readme",
+  "homepage": "https://github.com/doesdev/rollup-plugin-analyzer#readme",
   "devDependencies": {
     "ava": "^0.25.0",
     "husky": "^0.14.3",
-    "rollup": "^0.60.1",
+    "rollup": "latest",
     "rollup40": "npm:rollup@0.40.x",
     "rollup45": "npm:rollup@0.45.x",
     "rollup50": "npm:rollup@0.50.x",

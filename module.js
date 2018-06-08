@@ -101,7 +101,7 @@ export const plugin = (opts = {}) => {
     return analyze({modules}, opts, !opts.onAnalysis).then(cb)
   })
   return {
-    name: 'rollup-analyzer-plugin',
+    name: 'rollup-plugin-analyzer',
     transformChunk: (_a, _b, chunk) => new Promise((resolve, reject) => {
       resolve(null)
       if (!chunk || !chunk.orderedModules) return
