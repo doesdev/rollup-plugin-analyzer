@@ -13,12 +13,14 @@ const formatBytes = (bytes) => {
   let i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 };
+const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0);
 
 const analyze = (bundle, opts = {}, format = false) => {
   let { root, limit, filter } = opts;
   root = root || (process && process.cwd ? process.cwd() : null);
   let deps = {};
   let bundleSize = 0;
+  let bundleOrigSize = 0;
   let bundleModules = bundle.modules;
 
   return new Promise((resolve, reject) => {
@@ -28,6 +30,7 @@ const analyze = (bundle, opts = {}, format = false) => {
       let size = renderedLength;
       if (!size && size !== 0) size = code ? Buffer.byteLength(code, 'utf8') : 0;
       bundleSize += size;
+      bundleOrigSize += origSize;
 
       if (Array.isArray(filter) && !filter.some((f) => id.match(f))) return null
       if (typeof filter === 'string' && !id.match(filter)) return null
@@ -46,22 +49,26 @@ const analyze = (bundle, opts = {}, format = false) => {
     modules.forEach((m) => {
       m.dependents = deps[m.id] || [];
       m.percent = Math.min(((m.size / bundleSize) * 100).toFixed(2), 100);
-      m.reduction = Math.max((100 - ((m.size / m.origSize) * 100)).toFixed(2), 0);
+      m.reduction = shakenPct(m.size, m.origSize);
     });
 
     if (!format) return resolve(modules)
 
     let heading = `Rollup File Analysis\n`;
-    let displaySize = `${borderX}bundle size: ${formatBytes(bundleSize)}\n`;
-    let formatted = `${borderX}${heading}${displaySize}${borderX}`;
+    let bdlSize = `bundle size:    ${formatBytes(bundleSize)}\n`;
+    let bdlOrigSize = `original size:  ${formatBytes(bundleOrigSize)}\n`;
+    let reduction = `code reduction: ${shakenPct(bundleSize, bundleOrigSize)}%\n`;
+    let formatted = [
+      borderX, heading, borderX, bdlSize, bdlOrigSize, reduction, borderX
+    ].join('');
 
     modules.forEach((m) => {
-      formatted += `file:${buf}${m.id}\n`;
-      formatted += `size:${buf}${formatBytes(m.size)}\n`;
-      formatted += `percent:${buf}${m.percent}%\n`;
-      formatted += `orig. size:${buf}${formatBytes(m.origSize || 'unknown')}\n`;
-      formatted += `code reduction:${buf}${m.reduction}%\n`;
-      formatted += `dependents:${buf}${m.dependents.length}\n`;
+      formatted += `file:           ${buf}${m.id}\n`;
+      formatted += `bundle space:   ${buf}${m.percent}%\n`;
+      formatted += `rendered size:  ${buf}${formatBytes(m.size)}\n`;
+      formatted += `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n`;
+      formatted += `code reduction: ${buf}${m.reduction}%\n`;
+      formatted += `dependents:     ${buf}${m.dependents.length}\n`;
       m.dependents.forEach((d) => {
         formatted += `${tab}-${buf}${d.replace(root, '')}\n`;
       });
