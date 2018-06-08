@@ -114,6 +114,7 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, opts)
     let bundle = await rollup(rollOpts)
     await bundle.generate({format: 'cjs'})
+    if (version === 'latest') console.log(results)
     assert.is(results.substr(0, expectHeader.length), expectHeader)
   })
 

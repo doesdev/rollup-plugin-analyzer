@@ -57,19 +57,32 @@ logged to console on rollup completion
 -----------------------------
 Rollup File Analysis
 -----------------------------
-bundle size: 1.146 MB
+bundle size:    2.809 KB
+original size:  11.384 KB
+code reduction: 75.33 %
 -----------------------------
-file: \node_modules\html5-history-api\history.js
-size: 38.502 KB
-percent: 3.36%
-dependents: 1
-  - \app\modules\page.js
+file:            \test\fixtures\import-d.js
+bundle space:    90.64 %
+rendered size:   2.546 KB
+original size:   2.57 KB
+code reduction:  0.93 %
+dependents:      1
+  - \test\fixtures\import-c.js
 -----------------------------
-file: \node_modules\pikaday\pikaday.js
-size: 34.683 KB
-percent: 3.03%
-dependents: 1
-  - \app\helpers\transformer.js
+file:            \test\fixtures\bundle.js
+bundle space:    4.27 %
+rendered size:   120 Bytes
+original size:   267 Bytes
+code reduction:  55.06 %
+dependents:      0
+-----------------------------
+file:            \test\fixtures\import-c.js
+bundle space:    2.95 %
+rendered size:   83 Bytes
+original size:   161 Bytes
+code reduction:  48.45 %
+dependents:      1
+  - \test\fixtures\import-b.js
 ...
 ```
 

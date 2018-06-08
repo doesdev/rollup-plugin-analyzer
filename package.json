@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-analyzer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Mad metrics for your rollup bundles, know all the things",
   "main": "index.js",
   "module": "module.js",
