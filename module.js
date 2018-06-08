@@ -14,7 +14,7 @@ const formatBytes = (bytes) => {
 const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0)
 
 export const analyze = (bundle, opts = {}, format = false) => {
-  let { root, limit, filter } = opts
+  let { root, limit, filter, hideDeps } = opts
   root = root || (process && process.cwd ? process.cwd() : null)
   let deps = {}
   let bundleSize = 0
@@ -55,21 +55,23 @@ export const analyze = (bundle, opts = {}, format = false) => {
     let heading = `Rollup File Analysis\n`
     let bdlSize = `bundle size:    ${formatBytes(bundleSize)}\n`
     let bdlOrigSize = `original size:  ${formatBytes(bundleOrigSize)}\n`
-    let reduction = `code reduction: ${shakenPct(bundleSize, bundleOrigSize)}%\n`
+    let reduction = `code reduction: ${shakenPct(bundleSize, bundleOrigSize)} %\n`
     let formatted = [
       borderX, heading, borderX, bdlSize, bdlOrigSize, reduction, borderX
     ].join('')
 
     modules.forEach((m) => {
       formatted += `file:           ${buf}${m.id}\n`
-      formatted += `bundle space:   ${buf}${m.percent}%\n`
+      formatted += `bundle space:   ${buf}${m.percent} %\n`
       formatted += `rendered size:  ${buf}${formatBytes(m.size)}\n`
       formatted += `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n`
-      formatted += `code reduction: ${buf}${m.reduction}%\n`
+      formatted += `code reduction: ${buf}${m.reduction} %\n`
       formatted += `dependents:     ${buf}${m.dependents.length}\n`
-      m.dependents.forEach((d) => {
-        formatted += `${tab}-${buf}${d.replace(root, '')}\n`
-      })
+      if (!hideDeps) {
+        m.dependents.forEach((d) => {
+          formatted += `${tab}-${buf}${d.replace(root, '')}\n`
+        })
+      }
       formatted += `${borderX}`
     })
 
