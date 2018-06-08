@@ -52,12 +52,16 @@ const analyze = (bundle, opts = {}, format = false) => {
       m.reduction = shakenPct(m.size, m.origSize);
     });
 
-    if (!format) return resolve(modules)
+    let bundleReduction = shakenPct(bundleSize, bundleOrigSize);
+
+    if (!format) {
+      return resolve({bundleSize, bundleOrigSize, bundleReduction, modules})
+    }
 
     let heading = `Rollup File Analysis\n`;
     let bdlSize = `bundle size:    ${formatBytes(bundleSize)}\n`;
     let bdlOrigSize = `original size:  ${formatBytes(bundleOrigSize)}\n`;
-    let reduction = `code reduction: ${shakenPct(bundleSize, bundleOrigSize)} %\n`;
+    let reduction = `code reduction: ${bundleReduction} %\n`;
     let formatted = [
       borderX, heading, borderX, bdlSize, bdlOrigSize, reduction, borderX
     ].join('');

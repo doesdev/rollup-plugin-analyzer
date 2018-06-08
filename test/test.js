@@ -44,48 +44,59 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     assert.is(results.substr(0, headerLength), expectHeader)
   })
 
-  test(`${version}: analyze returns array`, async (assert) => {
+  test(`${version}: analyze.modules returns array`, async (assert) => {
     let bundle = await rollup(opts)
     let results = await analyze(bundle)
-    assert.true(Array.isArray(results))
+    assert.true(Array.isArray(results.modules))
   })
 
-  test(`${version}: analysis child objects have expected properties`, async (assert) => {
+  test(`${version}: analysis object has expected properties`, async (assert) => {
     let bundle = await rollup(opts)
-    let result = (await analyze(bundle))[0]
-    assert.true('id' in result)
-    assert.true('size' in result)
-    assert.true('dependents' in result)
-    assert.true('percent' in result)
+    let result = await analyze(bundle)
+    assert.true('bundleSize' in result)
+    assert.true('bundleOrigSize' in result)
+    assert.true('bundleReduction' in result)
+    assert.true('modules' in result)
+    let firstModule = result.modules[0]
+    assert.true('id' in firstModule)
+    assert.true('size' in firstModule)
+    assert.true('dependents' in firstModule)
+    assert.true('percent' in firstModule)
   })
 
   test(`${version}: limit works`, async (assert) => {
     let bundle = await rollup(opts)
-    assert.is((await analyze(bundle, {limit: 0})).length, 0)
-    assert.is((await analyze(bundle, {limit: 1})).length, 1)
-    assert.is((await analyze(bundle, {limit: 0})).length, 0)
+    assert.is((await analyze(bundle, {limit: 0})).modules.length, 0)
+    assert.is((await analyze(bundle, {limit: 1})).modules.length, 1)
+    assert.is((await analyze(bundle, {limit: 0})).modules.length, 0)
   })
 
   test(`${version}: filter with array works`, async (assert) => {
     let bundle = await rollup(opts)
-    assert.is((await analyze(bundle, {filter: ['jimmy', 'jerry']})).length, 0)
-    assert.is((await analyze(bundle, {filter: ['import-a', 'jessie']})).length, 1)
+    assert.is(
+      (await analyze(bundle, {filter: ['jimmy', 'jerry']})).modules.length,
+      0
+    )
+    assert.is(
+      (await analyze(bundle, {filter: ['import-a', 'jessie']})).modules.length,
+      1
+    )
   })
 
   test(`${version}: filter with string works`, async (assert) => {
     let bundle = await rollup(opts)
-    assert.is((await analyze(bundle, {filter: 'jimmy'})).length, 0)
-    assert.is((await analyze(bundle, {filter: 'import-b'})).length, 1)
+    assert.is((await analyze(bundle, {filter: 'jimmy'})).modules.length, 0)
+    assert.is((await analyze(bundle, {filter: 'import-b'})).modules.length, 1)
   })
 
   test(`${version}: root works as expected`, async (assert) => {
     let bundle = await rollup(opts)
     assert.not(
-      join(__dirname, (await analyze(bundle, {root: 'fakepath'}))[0].id),
+      join(__dirname, (await analyze(bundle, {root: 'fakepath'})).modules[0].id),
       resolve(fixtures, 'import-a.js')
     )
     assert.is(
-      join(__dirname, (await analyze(bundle, {root: __dirname}))[0].id),
+      join(__dirname, (await analyze(bundle, {root: __dirname})).modules[0].id),
       resolve(fixtures, 'import-a.js')
     )
   })
@@ -109,7 +120,7 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
   if (!noTreeshake) {
     test(`${version}: tree shaking is accounted for`, async (assert) => {
       let results
-      let onAnalysis = (r) => { results = r }
+      let onAnalysis = (r) => { results = r.modules }
       let plugins = [plugin({onAnalysis})]
       let rollOpts = Object.assign({}, opts, {plugins})
       let bundle = await rollup(rollOpts)

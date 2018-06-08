@@ -91,14 +91,34 @@ dependents: 1
   - type: String
   - default: `process.cwd()`
   - description: Application directory, used to display file paths relatively
-
-
-- returns
-  - **analysis** *(Object)*
-    - **id** *(String)* - path of module / rollup module id
-    - **size** *(Number)* - size of module in bytes
-    - **dependents** *(Array)* - list of dependent module ids / paths
-    - **percent** *(Number)* - percentage of module size relative to entire bundle
+- **hideDeps** - *optional*
+  - type: Boolean
+  - default: `false`
+  - description: Don't itemize dependents in the formatted output
+- **writeTo** - *optional*
+  - type: Function
+  - default: `null`
+  - description: Callback to be invoked with formatted string
+  - callback invoked with:
+    - **analysisString** *(String)*
+- **onAnalysis** - *optional*
+  - type: Function
+  - default: `null`
+  - description: Callback to be invoked with analysis object
+  - notes: if this is set the formatted string will not be output
+  - callback invoked with:
+    - **analysisObject** *(Object)*
+      - **bundleSize** *(Number)* - rendered bundle size in bytes
+      - **bundleOrigSize** *(Number)* - original bundle size in bytes
+      - **bundleReduction** *(Number)* - percentage of rendered bundle size reduction
+      - **modules** *(Array)* - array of `module` analysis objects
+        - **module** *(Object)*
+          - **id** *(String)* - path of module / rollup module id
+          - **size** *(Number)* - size of rendered module code in bytes
+          - **origSize** *(Number)* - size of module's original code in bytes
+          - **dependents** *(Array)* - list of dependent module ids / paths
+          - **percent** *(Number)* - percentage of module size relative to entire bundle
+          - **reduction** *(Number)* - percentage of rendered size reduction
 
 
 ## License
