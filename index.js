@@ -18,17 +18,15 @@ const analyze = (bundle, opts = {}, format = false) => {
   let { root, limit, filter } = opts;
   root = root || (process && process.cwd ? process.cwd() : null);
   let deps = {};
-  let entrySize;
   let bundleSize = 0;
   let bundleModules = bundle.modules;
 
   return new Promise((resolve, reject) => {
     let modules = bundleModules.map((m, i) => {
-      let { id, originalLength: origSize, renderedLength, isEntry, code } = m;
+      let { id, originalLength: origSize, renderedLength, code } = m;
       id = id.replace(root, '');
       let size = renderedLength;
       if (!size && size !== 0) size = code ? Buffer.byteLength(code, 'utf8') : 0;
-      if (isEntry) entrySize = size;
       bundleSize += size;
 
       if (Array.isArray(filter) && !filter.some((f) => id.match(f))) return null
@@ -40,10 +38,8 @@ const analyze = (bundle, opts = {}, format = false) => {
         deps[d].push(id);
       });
 
-      return {id, size, origSize, isEntry}
+      return {id, size, origSize}
     }).filter((m) => m);
-
-    if (entrySize) bundleSize = entrySize;
 
     modules.sort((a, b) => b.size - a.size);
     if (limit || limit === 0) modules = modules.slice(0, limit);
@@ -60,7 +56,6 @@ const analyze = (bundle, opts = {}, format = false) => {
     let formatted = `${borderX}${heading}${displaySize}${borderX}`;
 
     modules.forEach((m) => {
-      if (m.isEntry) return
       formatted += `file:${buf}${m.id}\n`;
       formatted += `size:${buf}${formatBytes(m.size)}\n`;
       formatted += `percent:${buf}${m.percent}%\n`;
@@ -94,7 +89,6 @@ const plugin = (opts = {}) => {
       modules.forEach((m) => {
         let bm = bundle.modules[m.id];
         bm.id = bm.id || m.id;
-        bm.isEntry = bm.isEntry || m.isEntry;
         bm.dependencies = m.dependencies || [];
       });
       modules = Object.keys(bundle.modules).map((k) => bundle.modules[k]);
@@ -109,11 +103,7 @@ const plugin = (opts = {}) => {
       resolve(null);
       if (!chunk || !chunk.orderedModules) return
       modules = chunk.orderedModules.map((m) => {
-        return {
-          id: m.id,
-          isEntry: m.isEntryPoint,
-          dependencies: m.dependencies.map((d) => d.id)
-        }
+        return {id: m.id, dependencies: m.dependencies.map((d) => d.id)}
       });
     }),
     generateBundle: runAnalysis,

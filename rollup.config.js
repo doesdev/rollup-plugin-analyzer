@@ -1,7 +1,8 @@
 'use strict'
 
-// how meta
+import { plugin } from './module'
 export default {
+  plugins: [plugin()],
   input: 'module.js',
   output: {
     file: 'index.js',

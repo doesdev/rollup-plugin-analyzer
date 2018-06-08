@@ -110,9 +110,11 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     test(`${version}: tree shaking is accounted for`, async (assert) => {
       let results
       let onAnalysis = (r) => { results = r }
-      let rollOpts = Object.assign({plugins: [plugin({onAnalysis})]}, opts)
+      let plugins = [plugin({onAnalysis})]
+      let rollOpts = Object.assign({}, opts, {plugins})
       let bundle = await rollup(rollOpts)
-      await bundle.generate({format: 'cjs'})
+      let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
+      await bundle.write(output)
       let imported = results.find((r) => r.id.indexOf('import-a') !== -1)
       assert.is(imported.size, 27)
     })
