@@ -47,8 +47,8 @@ export const analyze = (bundle, opts = {}, format = false) => {
     if (limit || limit === 0) modules = modules.slice(0, limit)
     modules.forEach((m) => {
       m.dependents = deps[m.id] || []
-      m.percent = ((m.size / bundleSize) * 100).toFixed(2)
-      m.reduction = 100 - ((m.size / m.origSize) * 100).toFixed(2)
+      m.percent = Math.min(((m.size / bundleSize) * 100).toFixed(2), 100)
+      m.reduction = Math.max((100 - ((m.size / m.origSize) * 100)).toFixed(2), 0)
     })
 
     if (!format) return resolve(modules)
