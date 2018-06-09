@@ -89,6 +89,14 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     assert.is((await analyze(bundle, {filter: 'import-b'})).modules.length, 1)
   })
 
+  test(`${version}: filter with callback works`, async (assert) => {
+    let bundle = await rollup(opts)
+    let noMatch = (m) => m.id.indexOf('jimmy') !== -1
+    let hasMatch = (m) => m.id.indexOf('import-b') !== -1
+    assert.is((await analyze(bundle, {filter: noMatch})).modules.length, 0)
+    assert.is((await analyze(bundle, {filter: hasMatch})).modules.length, 1)
+  })
+
   test(`${version}: root works as expected`, async (assert) => {
     let bundle = await rollup(opts)
     assert.not(
@@ -114,7 +122,6 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, opts)
     let bundle = await rollup(rollOpts)
     await bundle.generate({format: 'cjs'})
-    if (version === 'latest') console.log(results)
     assert.is(results.substr(0, expectHeader.length), expectHeader)
   })
 
@@ -129,6 +136,18 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
       await bundle.write(output)
       let imported = results.find((r) => r.id.indexOf('import-a') !== -1)
       assert.is(imported.size, 27)
+    })
+
+    test(`${version}: treeshaken bundle filters with callback`, async (assert) => {
+      let results
+      let filter = (m) => m.size > 2000
+      let onAnalysis = (r) => { results = r.modules }
+      let plugins = [plugin({onAnalysis, filter})]
+      let rollOpts = Object.assign({}, opts, {plugins})
+      let bundle = await rollup(rollOpts)
+      let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
+      await bundle.write(output)
+      assert.is(results.length, 1)
     })
   }
 })

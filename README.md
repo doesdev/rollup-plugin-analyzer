@@ -30,12 +30,12 @@ $ npm install --save-dev rollup-plugin-analyzer
 ### from rollup config
 ```js
 import { plugin as analyze } from 'rollup-analyzer-plugin'
-const opts = {limit: 5, filter: [], root: __dirname}
+
 export default {
   entry: 'module.js',
   dest: 'index.js',
   format: 'cjs',
-  plugins: [analyze(opts)]
+  plugins: [analyze()]
 }
 ```
 
@@ -43,11 +43,30 @@ export default {
 ```js
 import { rollup } from 'rollup'
 import { plugin as analyze } from 'rollup-analyzer-plugin'
-const opts = {limit: 5, filter: [], root: __dirname}
 
 rollup({
   entry: 'main.js',
-  plugins: [analyze(opts)]
+  plugins: [analyze()]
+}).then(...)
+```
+
+### CI usage example
+```js
+import { rollup } from 'rollup'
+import { plugin as analyze } from 'rollup-analyzer-plugin'
+const limitBytes = 1e6
+
+const onAnalysis = ({bundleSize}) => {
+  if (bundleSize < limitBytes) return
+  console.log(`Bundle size exceeds ${limitBytes} bytes: ${bundleSize} bytes`)
+  return process.exit(1)
+}
+import { rollup } from 'rollup'
+import { plugin as analyze } from 'rollup-analyzer-plugin'
+
+rollup({
+  entry: 'main.js',
+  plugins: [analyze({onAnalysis})]
 }).then(...)
 ```
 
@@ -97,9 +116,10 @@ dependents:      1
   - default: `null`
   - description: Limit number of files to output analysis of, sorted by DESC size
 - **filter** - *optional*
-  - type: Array | String
+  - type: Array | String | Function
   - default: `null`
   - description: Filter to only show imports matching the specified name(s)
+  - notes: Function receives `module` object specified below, should return boolean
 - **root** - *optional*
   - type: String
   - default: `process.cwd()`

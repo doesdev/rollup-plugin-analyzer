@@ -12,6 +12,7 @@ const formatBytes = (bytes) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0)
+const match = (str, check) => str.indexOf(check) !== -1
 
 export const analyze = (bundle, opts = {}, format = false) => {
   let { root, limit, filter, hideDeps } = opts
@@ -30,8 +31,8 @@ export const analyze = (bundle, opts = {}, format = false) => {
       bundleSize += size
       bundleOrigSize += origSize
 
-      if (Array.isArray(filter) && !filter.some((f) => id.match(f))) return null
-      if (typeof filter === 'string' && !id.match(filter)) return null
+      if (Array.isArray(filter) && !filter.some((f) => match(id, f))) return null
+      if (typeof filter === 'string' && !match(id, filter)) return null
 
       m.dependencies.forEach((d) => {
         d = d.replace(root, '')
@@ -49,6 +50,7 @@ export const analyze = (bundle, opts = {}, format = false) => {
       m.percent = Math.min(((m.size / bundleSize) * 100).toFixed(2), 100)
       m.reduction = shakenPct(m.size, m.origSize)
     })
+    if (typeof filter === 'function') modules = modules.filter(filter)
 
     let bundleReduction = shakenPct(bundleSize, bundleOrigSize)
 

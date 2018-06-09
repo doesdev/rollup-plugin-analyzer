@@ -2246,7 +2246,7 @@ rimraf@^2.6.1:
     "@types/estree" "0.0.39"
     "@types/node" "*"
 
-rollup@^0.60.1:
+rollup@latest:
   version "0.60.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.60.1.tgz#07cb66153f1541d5f7e82b8393b405c31647dae9"
   dependencies:
