@@ -77,6 +77,7 @@ Rollup File Analysis
 bundle size:    2.809 KB
 original size:  11.384 KB
 code reduction: 75.33 %
+module count:   5
 -----------------------------
 file:            \test\fixtures\import-d.js
 bundle space:    90.64 %
