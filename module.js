@@ -20,7 +20,8 @@ export const analyze = (bundle, opts = {}, format = false) => {
   let deps = {}
   let bundleSize = 0
   let bundleOrigSize = 0
-  let bundleModules = bundle.modules
+  let bundleModules = bundle.modules || []
+  let moduleCount = bundleModules.length
 
   return new Promise((resolve, reject) => {
     let modules = bundleModules.map((m, i) => {
@@ -62,8 +63,9 @@ export const analyze = (bundle, opts = {}, format = false) => {
     let bdlSize = `bundle size:    ${formatBytes(bundleSize)}\n`
     let bdlOrigSize = `original size:  ${formatBytes(bundleOrigSize)}\n`
     let reduction = `code reduction: ${bundleReduction} %\n`
+    let count = `module count:   ${moduleCount}\n`
     let formatted = [
-      borderX, heading, borderX, bdlSize, bdlOrigSize, reduction, borderX
+      borderX, heading, borderX, bdlSize, bdlOrigSize, reduction, count, borderX
     ].join('')
 
     modules.forEach((m) => {
