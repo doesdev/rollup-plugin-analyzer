@@ -61,8 +61,6 @@ const onAnalysis = ({bundleSize}) => {
   console.log(`Bundle size exceeds ${limitBytes} bytes: ${bundleSize} bytes`)
   return process.exit(1)
 }
-import { rollup } from 'rollup'
-import { plugin as analyze } from 'rollup-analyzer-plugin'
 
 rollup({
   entry: 'main.js',
