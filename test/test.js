@@ -119,7 +119,8 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
   test(`${version}: plugin writes expected results`, async (assert) => {
     let results
     let writeTo = (r) => { results = r }
-    let rollOpts = Object.assign({plugins: [plugin({writeTo, version})]}, opts)
+    let showExports = true
+    let rollOpts = Object.assign({plugins: [plugin({writeTo, showExports})]}, opts)
     let bundle = await rollup(rollOpts)
     await bundle.generate({format: 'cjs'})
     assert.is(results.substr(0, expectHeader.length), expectHeader)

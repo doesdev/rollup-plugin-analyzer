@@ -127,6 +127,10 @@ dependents:      1
   - type: Boolean
   - default: `false`
   - description: Don't itemize dependents in the formatted output
+- **showExports** - *optional*
+  - type: Boolean
+  - default: `false`
+  - description: Show used and unused exports
 - **writeTo** - *optional*
   - type: Function
   - default: `null`
@@ -151,6 +155,8 @@ dependents:      1
           - **dependents** *(Array)* - list of dependent module ids / paths
           - **percent** *(Number)* - percentage of module size relative to entire bundle
           - **reduction** *(Number)* - percentage of rendered size reduction
+          - **usedExports** *(Array)* - list of used named exports
+          - **unusedExports** *(Array)* - list of unused named exports
 
 
 ## License

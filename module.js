@@ -15,7 +15,7 @@ const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0)
 const match = (str, check) => str.indexOf(check) !== -1
 
 export const analyze = (bundle, opts = {}, format = false) => {
-  let { root, limit, filter, hideDeps } = opts
+  let { root, limit, filter, hideDeps, showExports } = opts
   root = root || (process && process.cwd ? process.cwd() : null)
   let deps = {}
   let bundleSize = 0
@@ -25,7 +25,14 @@ export const analyze = (bundle, opts = {}, format = false) => {
 
   return new Promise((resolve, reject) => {
     let modules = bundleModules.map((m, i) => {
-      let { id, originalLength: origSize, renderedLength, code } = m
+      let {
+        id,
+        originalLength: origSize,
+        renderedLength,
+        code,
+        usedExports,
+        unusedExports
+      } = m
       id = id.replace(root, '')
       let size = renderedLength
       if (!size && size !== 0) size = code ? Buffer.byteLength(code, 'utf8') : 0
@@ -41,7 +48,7 @@ export const analyze = (bundle, opts = {}, format = false) => {
         deps[d].push(id)
       })
 
-      return {id, size, origSize}
+      return {id, size, origSize, usedExports, unusedExports}
     }).filter((m) => m)
 
     modules.sort((a, b) => b.size - a.size)
@@ -77,9 +84,20 @@ export const analyze = (bundle, opts = {}, format = false) => {
         `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n` +
         `code reduction: ${buf}${m.reduction} %\n` +
         `dependents:     ${buf}${m.dependents.length}\n`
+
       if (!hideDeps) {
         m.dependents.forEach((d) => {
           formatted += `${tab}-${buf}${d.replace(root, '')}\n`
+        })
+      }
+      if (showExports && m.usedExports && m.unusedExports) {
+        formatted += `used exports:   ${buf}${m.usedExports.length}\n`
+        m.usedExports.forEach((e) => {
+          formatted += `${tab}-${buf}${e}\n`
+        })
+        formatted += `unused exports: ${buf}${m.unusedExports.length}\n`
+        m.unusedExports.forEach((e) => {
+          formatted += `${tab}-${buf}${e}\n`
         })
       }
       formatted += `${borderX}`
@@ -107,6 +125,8 @@ export const plugin = (opts = {}) => {
       modules.forEach((m) => {
         let bm = bundle.modules[m.id]
         bm.id = bm.id || m.id
+        bm.usedExports = bm.renderedExports || m.renderedExports
+        bm.unusedExports = bm.removedExports || m.removedExports
         bm.dependencies = m.dependencies || []
       })
       modules = Object.keys(bundle.modules).map((k) => bundle.modules[k])
