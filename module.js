@@ -59,22 +59,24 @@ export const analyze = (bundle, opts = {}, format = false) => {
       return resolve({bundleSize, bundleOrigSize, bundleReduction, modules})
     }
 
-    let heading = `Rollup File Analysis\n`
-    let bdlSize = `bundle size:    ${formatBytes(bundleSize)}\n`
-    let bdlOrigSize = `original size:  ${formatBytes(bundleOrigSize)}\n`
-    let reduction = `code reduction: ${bundleReduction} %\n`
-    let count = `module count:   ${moduleCount}\n`
-    let formatted = [
-      borderX, heading, borderX, bdlSize, bdlOrigSize, reduction, count, borderX
-    ].join('')
+    let formatted = `` +
+      `${borderX}` +
+      `Rollup File Analysis\n` +
+      `${borderX}` +
+      `bundle size:    ${formatBytes(bundleSize)}\n` +
+      `original size:  ${formatBytes(bundleOrigSize)}\n` +
+      `code reduction: ${bundleReduction} %\n` +
+      `module count:   ${moduleCount}\n` +
+      `${borderX}`
 
     modules.forEach((m) => {
-      formatted += `file:           ${buf}${m.id}\n`
-      formatted += `bundle space:   ${buf}${m.percent} %\n`
-      formatted += `rendered size:  ${buf}${formatBytes(m.size)}\n`
-      formatted += `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n`
-      formatted += `code reduction: ${buf}${m.reduction} %\n`
-      formatted += `dependents:     ${buf}${m.dependents.length}\n`
+      formatted += `` +
+        `file:           ${buf}${m.id}\n` +
+        `bundle space:   ${buf}${m.percent} %\n` +
+        `rendered size:  ${buf}${formatBytes(m.size)}\n` +
+        `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n` +
+        `code reduction: ${buf}${m.reduction} %\n` +
+        `dependents:     ${buf}${m.dependents.length}\n`
       if (!hideDeps) {
         m.dependents.forEach((d) => {
           formatted += `${tab}-${buf}${d.replace(root, '')}\n`
@@ -100,6 +102,7 @@ export const plugin = (opts = {}) => {
     if (written) return
     written = true
     if (out.bundle) bundle = out.bundle
+
     if (!Array.isArray(bundle.modules)) {
       modules.forEach((m) => {
         let bm = bundle.modules[m.id]
@@ -110,8 +113,10 @@ export const plugin = (opts = {}) => {
     } else {
       modules = bundle.modules
     }
+
     return analyze({modules}, opts, !opts.onAnalysis).then(cb)
   })
+
   return {
     name: 'rollup-plugin-analyzer',
     transformChunk: (_a, _b, chunk) => new Promise((resolve, reject) => {
