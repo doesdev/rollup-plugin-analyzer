@@ -116,7 +116,7 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     assert.is(typeof results, 'string')
   })
 
-  test(`${version}: plugin writes expected results`, async (assert) => {
+  test(`${version}: plugin writes expected heading content`, async (assert) => {
     let results
     let writeTo = (r) => { results = r }
     let showExports = true
@@ -149,6 +149,31 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
       let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
       await bundle.write(output)
       assert.is(results.length, 1)
+    })
+  }
+
+  if (version === '0.60.x') {
+    test(`${version}: writes expected heading with experimentalCodeSplitting`, async (assert) => {
+      let results
+      let writeTo = (r) => { results = r }
+      let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, opts)
+      rollOpts.experimentalCodeSplitting = true
+      let bundle = await rollup(rollOpts)
+      await bundle.generate({format: 'cjs'})
+      assert.is(results.substr(0, expectHeader.length), expectHeader)
+    })
+
+    test(`${version}: data as expected with experimentalCodeSplitting`, async (assert) => {
+      let results
+      let onAnalysis = (r) => { results = r.modules }
+      let plugins = [plugin({onAnalysis})]
+      let rollOpts = Object.assign({}, opts, {plugins})
+      rollOpts.experimentalCodeSplitting = true
+      let bundle = await rollup(rollOpts)
+      let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
+      await bundle.write(output)
+      let imported = results.find((r) => r.id.indexOf('import-a') !== -1)
+      assert.is(imported.size, 27)
     })
   }
 })
