@@ -12,12 +12,16 @@ import { rollup as rollup45 } from 'rollup45'
 import { rollup as rollup40 } from 'rollup40'
 const fixtures = resolve(__dirname, 'fixtures')
 const baseOpts = {
-  input: join(fixtures, 'bundle.js'),
+  input: join(fixtures, 'bundle-a.js'),
   output: {format: 'cjs'}
 }
 const oldOpts = {
-  entry: join(fixtures, 'bundle.js'),
+  entry: join(fixtures, 'bundle-a.js'),
   format: 'cjs'
+}
+const multiInputOpts = {
+  input: [join(fixtures, 'bundle-a.js'), join(fixtures, 'bundle-b.js')],
+  output: {format: 'cjs', dir: join(fixtures, 'multi')}
 }
 const expectHeader = `
 -----------------------------
@@ -153,25 +157,26 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
   }
 
   if (version === '0.60.x') {
-    test(`${version}: writes expected heading with experimentalCodeSplitting`, async (assert) => {
+    let split1 = `${version}: writes expected heading with experimentalCodeSplitting`
+    test.skip(split1, async (assert) => {
       let results
       let writeTo = (r) => { results = r }
-      let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, opts)
+      let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, multiInputOpts)
       rollOpts.experimentalCodeSplitting = true
       let bundle = await rollup(rollOpts)
       await bundle.generate({format: 'cjs'})
       assert.is(results.substr(0, expectHeader.length), expectHeader)
     })
 
-    test(`${version}: data as expected with experimentalCodeSplitting`, async (assert) => {
+    let split2 = `${version}: data as expected with experimentalCodeSplitting`
+    test.skip(split2, async (assert) => {
       let results
       let onAnalysis = (r) => { results = r.modules }
       let plugins = [plugin({onAnalysis})]
-      let rollOpts = Object.assign({}, opts, {plugins})
+      let rollOpts = Object.assign({}, multiInputOpts, {plugins})
       rollOpts.experimentalCodeSplitting = true
       let bundle = await rollup(rollOpts)
-      let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
-      await bundle.write(output)
+      await bundle.write(rollOpts.output)
       let imported = results.find((r) => r.id.indexOf('import-a') !== -1)
       assert.is(imported.size, 27)
     })
