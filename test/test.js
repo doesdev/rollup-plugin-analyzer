@@ -158,7 +158,7 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
 
   if (version === '0.60.x') {
     let split1 = `${version}: writes expected heading with experimentalCodeSplitting`
-    test.skip(split1, async (assert) => {
+    test(split1, async (assert) => {
       let results
       let writeTo = (r) => { results = r }
       let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, multiInputOpts)
@@ -169,16 +169,21 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     })
 
     let split2 = `${version}: data as expected with experimentalCodeSplitting`
-    test.skip(split2, async (assert) => {
-      let results
-      let onAnalysis = (r) => { results = r.modules }
+    test(split2, async (assert) => {
+      let results = []
+      let onAnalysis = (r) => { results.push(r.modules) }
       let plugins = [plugin({onAnalysis})]
       let rollOpts = Object.assign({}, multiInputOpts, {plugins})
       rollOpts.experimentalCodeSplitting = true
       let bundle = await rollup(rollOpts)
       await bundle.write(rollOpts.output)
-      let imported = results.find((r) => r.id.indexOf('import-a') !== -1)
-      assert.is(imported.size, 27)
+
+      let imports = [{id: 'import-a', size: 8238}, {id: 'import-b', size: 33}]
+      imports.forEach((imp, i) => {
+        let result = results[i]
+        let imported = result.find((r) => r.id.indexOf(imp.id) !== -1)
+        assert.is(imported.size, imp.size)
+      })
     })
   }
 })

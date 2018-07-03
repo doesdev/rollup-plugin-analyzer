@@ -112,28 +112,23 @@ export const formatted = (bndl, opts) => analyze(bndl, opts, true)
 export const plugin = (opts = {}) => {
   let cb = opts.writeTo || (opts.stdout ? console.log : console.error)
   if (opts.onAnalysis) cb = opts.onAnalysis
-  let written
-  let modules
+  let depMap = {}
 
   let runAnalysis = (out, bundle, isWrite) => new Promise((resolve, reject) => {
     resolve()
-    if (written) return
-    written = true
     if (out.bundle) bundle = out.bundle
+    let modules = bundle.modules
 
-    if (!Array.isArray(bundle.modules)) {
-      modules.forEach((m) => {
-        let bm = bundle.modules[m.id]
-        bm.id = bm.id || m.id
-        bm.usedExports = bm.renderedExports || m.renderedExports
-        bm.unusedExports = bm.removedExports || m.removedExports
-        bm.dependencies = m.dependencies || []
-      })
-      modules = Object.keys(bundle.modules).map((k) => bundle.modules[k])
-    } else {
-      modules = bundle.modules
+    if (Array.isArray(modules)) {
+      return analyze({modules}, opts, !opts.onAnalysis).then(cb)
     }
 
+    modules = Object.keys(modules).map((k) => {
+      let module = Object.assign(modules[k], depMap[k] || {})
+      module.usedExports = module.renderedExports
+      module.unusedExports = module.removedExports
+      return module
+    })
     return analyze({modules}, opts, !opts.onAnalysis).then(cb)
   })
 
@@ -142,8 +137,8 @@ export const plugin = (opts = {}) => {
     transformChunk: (_a, _b, chunk) => new Promise((resolve, reject) => {
       resolve(null)
       if (!chunk || !chunk.orderedModules) return
-      modules = chunk.orderedModules.map((m) => {
-        return {id: m.id, dependencies: m.dependencies.map((d) => d.id)}
+      chunk.orderedModules.forEach(({id, dependencies}) => {
+        depMap[id] = {id, dependencies: dependencies.map((d) => d.id)}
       })
     }),
     generateBundle: runAnalysis,

@@ -159,6 +159,12 @@ dependents:      1
           - **unusedExports** *(Array)* - list of unused named exports
 
 
+## Other considerations
+
+Rollup allows you to output to multiple files. If you are outputting to multiple
+files you will get a distinct analysis for each output file. Each analysis
+will contain data on the files imported by the respective target.
+
 ## License
 
 MIT © [Andrew Carpenter](https://github.com/doesdev)
