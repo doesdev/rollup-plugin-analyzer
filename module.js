@@ -56,7 +56,7 @@ export const reporter = (analysis, opts) => {
   return formatted
 }
 
-export const analyze = (bundle, opts = {}) => {
+const analyzer = (bundle, opts = {}) => {
   let { root, limit, filter } = opts
   root = root || (process && process.cwd ? process.cwd() : null)
   let deps = {}
@@ -65,54 +65,60 @@ export const analyze = (bundle, opts = {}) => {
   let bundleModules = bundle.modules || []
   let moduleCount = bundleModules.length
 
-  return new Promise((resolve, reject) => {
-    let modules = bundleModules.map((m, i) => {
-      let {
-        id,
-        originalLength: origSize,
-        renderedLength,
-        code,
-        usedExports,
-        unusedExports
-      } = m
-      id = id.replace(root, '')
-      let size = renderedLength
-      if (!size && size !== 0) size = code ? Buffer.byteLength(code, 'utf8') : 0
-      bundleSize += size
-      bundleOrigSize += origSize
+  let modules = bundleModules.map((m, i) => {
+    let {
+      id,
+      originalLength: origSize,
+      renderedLength,
+      code,
+      usedExports,
+      unusedExports
+    } = m
+    id = id.replace(root, '')
+    let size = renderedLength
+    if (!size && size !== 0) size = code ? Buffer.byteLength(code, 'utf8') : 0
+    bundleSize += size
+    bundleOrigSize += origSize
 
-      if (Array.isArray(filter) && !filter.some((f) => match(id, f))) return null
-      if (typeof filter === 'string' && !match(id, filter)) return null
+    if (Array.isArray(filter) && !filter.some((f) => match(id, f))) return null
+    if (typeof filter === 'string' && !match(id, filter)) return null
 
-      m.dependencies.forEach((d) => {
-        d = d.replace(root, '')
-        deps[d] = deps[d] || []
-        deps[d].push(id)
-      })
-
-      return {id, size, origSize, usedExports, unusedExports}
-    }).filter((m) => m)
-
-    modules.sort((a, b) => b.size - a.size)
-    if (limit || limit === 0) modules = modules.slice(0, limit)
-    modules.forEach((m) => {
-      m.dependents = deps[m.id] || []
-      m.percent = Math.min(((m.size / bundleSize) * 100).toFixed(2), 100)
-      m.reduction = shakenPct(m.size, m.origSize)
+    m.dependencies.forEach((d) => {
+      d = d.replace(root, '')
+      deps[d] = deps[d] || []
+      deps[d].push(id)
     })
-    if (typeof filter === 'function') modules = modules.filter(filter)
 
-    let bundleReduction = shakenPct(bundleSize, bundleOrigSize)
+    return {id, size, origSize, usedExports, unusedExports}
+  }).filter((m) => m)
 
-    return resolve({
-      bundleSize, bundleOrigSize, bundleReduction, modules, moduleCount
-    })
+  modules.sort((a, b) => b.size - a.size)
+  if (limit || limit === 0) modules = modules.slice(0, limit)
+  modules.forEach((m) => {
+    m.dependents = deps[m.id] || []
+    m.percent = Math.min(((m.size / bundleSize) * 100).toFixed(2), 100)
+    m.reduction = shakenPct(m.size, m.origSize)
   })
+  if (typeof filter === 'function') modules = modules.filter(filter)
+
+  let bundleReduction = shakenPct(bundleSize, bundleOrigSize)
+
+  return {bundleSize, bundleOrigSize, bundleReduction, modules, moduleCount}
 }
 
-export const formatted = (bndl, opts) => {
-  return analyze(bndl, opts).then((analysis) => reporter(analysis, opts))
-}
+export const analyze = (bundle, opts) => new Promise((resolve, reject) => {
+  try {
+    let analysis = analyzer(bundle, opts)
+    return resolve(analysis)
+  } catch (ex) { return reject(ex) }
+})
+
+export const formatted = (bundle, opts) => new Promise((resolve, reject) => {
+  try {
+    let analysis = analyzer(bundle, opts)
+    return resolve(reporter(analysis, opts))
+  } catch (ex) { return resolve(ex.toString()) }
+})
 
 export const plugin = (opts = {}) => {
   let writeTo = opts.writeTo || (opts.stdout ? console.log : console.error)
@@ -129,7 +135,7 @@ export const plugin = (opts = {}) => {
     let modules = bundle.modules
 
     if (Array.isArray(modules)) {
-      return analyze({modules}, opts).then(onAnalysis)
+      return analyze({modules}, opts).then(onAnalysis).catch(console.error)
     }
 
     modules = Object.keys(modules).map((k) => {
@@ -138,7 +144,7 @@ export const plugin = (opts = {}) => {
       module.unusedExports = module.removedExports
       return module
     })
-    return analyze({modules}, opts).then(onAnalysis)
+    return analyze({modules}, opts).then(onAnalysis).catch(console.error)
   })
 
   return {
