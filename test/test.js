@@ -186,5 +186,17 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
         assert.is(imported.size, imp.size)
       })
     })
+
+    test.failing(`${version}: callback is only invoked once`, async (assert) => {
+      let count = 0
+      let writeTo = () => ++count
+
+      let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, multiInputOpts)
+      rollOpts.experimentalCodeSplitting = true
+      let bundle = await rollup(rollOpts)
+      await bundle.generate({format: 'cjs'})
+
+      assert.is(count, 1)
+    })
   }
 })
