@@ -64,7 +64,7 @@ const onAnalysis = ({bundleSize}) => {
 
 rollup({
   entry: 'main.js',
-  plugins: [analyze({onAnalysis})]
+  plugins: [analyze({onAnalysis, skipFormatted: true})]
 }).then(...)
 ```
 
@@ -131,6 +131,10 @@ dependents:      1
   - type: Boolean
   - default: `false`
   - description: Show used and unused exports
+- **skipFormatted** - *optional*
+  - type: Boolean
+  - default: `false`
+  - description: Don't output formatted string
 - **writeTo** - *optional*
   - type: Function
   - default: `null`
@@ -141,12 +145,12 @@ dependents:      1
   - type: Function
   - default: `null`
   - description: Callback to be invoked with analysis object
-  - notes: if this is set the formatted string will not be output
   - callback invoked with:
     - **analysisObject** *(Object)*
       - **bundleSize** *(Number)* - rendered bundle size in bytes
       - **bundleOrigSize** *(Number)* - original bundle size in bytes
       - **bundleReduction** *(Number)* - percentage of rendered bundle size reduction
+      - **moduleCount** *(Number)* - Count of all included modules
       - **modules** *(Array)* - array of `module` analysis objects
         - **module** *(Object)*
           - **id** *(String)* - path of module / rollup module id

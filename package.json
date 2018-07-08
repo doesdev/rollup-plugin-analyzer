@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "test": "rollup -c && ava --verbose",
-    "precommit": "rollup -c && ava && git add index.js"
+    "precommit": "rollup -c && ava && git add index.js",
+    "changelog": "auto-changelog -u -l 50 && git add CHANGELOG.md"
   },
   "repository": {
     "type": "git",

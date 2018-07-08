@@ -10,6 +10,7 @@ import { rollup as rollup55 } from 'rollup55'
 import { rollup as rollup50 } from 'rollup50'
 import { rollup as rollup45 } from 'rollup45'
 import { rollup as rollup40 } from 'rollup40'
+const skipFormatted = true
 const fixtures = resolve(__dirname, 'fixtures')
 const baseOpts = {
   input: join(fixtures, 'bundle-a.js'),
@@ -134,7 +135,7 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     test(`${version}: tree shaking is accounted for`, async (assert) => {
       let results
       let onAnalysis = (r) => { results = r.modules }
-      let plugins = [plugin({onAnalysis})]
+      let plugins = [plugin({onAnalysis, skipFormatted})]
       let rollOpts = Object.assign({}, opts, {plugins})
       let bundle = await rollup(rollOpts)
       let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
@@ -147,7 +148,7 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
       let results
       let filter = (m) => m.size > 2000
       let onAnalysis = (r) => { results = r.modules }
-      let plugins = [plugin({onAnalysis, filter})]
+      let plugins = [plugin({onAnalysis, filter, skipFormatted})]
       let rollOpts = Object.assign({}, opts, {plugins})
       let bundle = await rollup(rollOpts)
       let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
@@ -172,7 +173,7 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     test(split2, async (assert) => {
       let results = []
       let onAnalysis = (r) => { results.push(r.modules) }
-      let plugins = [plugin({onAnalysis})]
+      let plugins = [plugin({onAnalysis, skipFormatted})]
       let rollOpts = Object.assign({}, multiInputOpts, {plugins})
       rollOpts.experimentalCodeSplitting = true
       let bundle = await rollup(rollOpts)

@@ -16,8 +16,50 @@ const formatBytes = (bytes) => {
 const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0);
 const match = (str, check) => str.indexOf(check) !== -1;
 
-const analyze = (bundle, opts = {}, format = false) => {
-  let { root, limit, filter, hideDeps, showExports } = opts;
+const reporter = (analysis, opts) => {
+  let formatted = `` +
+    `${borderX}` +
+    `Rollup File Analysis\n` +
+    `${borderX}` +
+    `bundle size:    ${formatBytes(analysis.bundleSize)}\n` +
+    `original size:  ${formatBytes(analysis.bundleOrigSize)}\n` +
+    `code reduction: ${analysis.bundleReduction} %\n` +
+    `module count:   ${analysis.moduleCount}\n` +
+    `${borderX}`;
+
+  analysis.modules.forEach((m) => {
+    formatted += `` +
+      `file:           ${buf}${m.id}\n` +
+      `bundle space:   ${buf}${m.percent} %\n` +
+      `rendered size:  ${buf}${formatBytes(m.size)}\n` +
+      `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n` +
+      `code reduction: ${buf}${m.reduction} %\n` +
+      `dependents:     ${buf}${m.dependents.length}\n`;
+
+    let { hideDeps, root, showExports } = opts || {};
+    if (!hideDeps) {
+      m.dependents.forEach((d) => {
+        formatted += `${tab}-${buf}${d.replace(root, '')}\n`;
+      });
+    }
+    if (showExports && m.usedExports && m.unusedExports) {
+      formatted += `used exports:   ${buf}${m.usedExports.length}\n`;
+      m.usedExports.forEach((e) => {
+        formatted += `${tab}-${buf}${e}\n`;
+      });
+      formatted += `unused exports: ${buf}${m.unusedExports.length}\n`;
+      m.unusedExports.forEach((e) => {
+        formatted += `${tab}-${buf}${e}\n`;
+      });
+    }
+    formatted += `${borderX}`;
+  });
+
+  return formatted
+};
+
+const analyze = (bundle, opts = {}) => {
+  let { root, limit, filter } = opts;
   root = root || (process && process.cwd ? process.cwd() : null);
   let deps = {};
   let bundleSize = 0;
@@ -64,57 +106,24 @@ const analyze = (bundle, opts = {}, format = false) => {
 
     let bundleReduction = shakenPct(bundleSize, bundleOrigSize);
 
-    if (!format) {
-      return resolve({bundleSize, bundleOrigSize, bundleReduction, modules})
-    }
-
-    let formatted = `` +
-      `${borderX}` +
-      `Rollup File Analysis\n` +
-      `${borderX}` +
-      `bundle size:    ${formatBytes(bundleSize)}\n` +
-      `original size:  ${formatBytes(bundleOrigSize)}\n` +
-      `code reduction: ${bundleReduction} %\n` +
-      `module count:   ${moduleCount}\n` +
-      `${borderX}`;
-
-    modules.forEach((m) => {
-      formatted += `` +
-        `file:           ${buf}${m.id}\n` +
-        `bundle space:   ${buf}${m.percent} %\n` +
-        `rendered size:  ${buf}${formatBytes(m.size)}\n` +
-        `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n` +
-        `code reduction: ${buf}${m.reduction} %\n` +
-        `dependents:     ${buf}${m.dependents.length}\n`;
-
-      if (!hideDeps) {
-        m.dependents.forEach((d) => {
-          formatted += `${tab}-${buf}${d.replace(root, '')}\n`;
-        });
-      }
-      if (showExports && m.usedExports && m.unusedExports) {
-        formatted += `used exports:   ${buf}${m.usedExports.length}\n`;
-        m.usedExports.forEach((e) => {
-          formatted += `${tab}-${buf}${e}\n`;
-        });
-        formatted += `unused exports: ${buf}${m.unusedExports.length}\n`;
-        m.unusedExports.forEach((e) => {
-          formatted += `${tab}-${buf}${e}\n`;
-        });
-      }
-      formatted += `${borderX}`;
-    });
-
-    return resolve(formatted)
+    return resolve({
+      bundleSize, bundleOrigSize, bundleReduction, modules, moduleCount
+    })
   })
 };
 
-const formatted = (bndl, opts) => analyze(bndl, opts, true);
+const formatted = (bndl, opts) => {
+  return analyze(bndl, opts).then((analysis) => reporter(analysis, opts))
+};
 
 const plugin = (opts = {}) => {
-  let cb = opts.writeTo || (opts.stdout ? console.log : console.error);
-  if (opts.onAnalysis) cb = opts.onAnalysis;
+  let writeTo = opts.writeTo || (opts.stdout ? console.log : console.error);
   let depMap = {};
+
+  let onAnalysis = (analysis) => {
+    if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis);
+    if (!opts.skipFormatted) writeTo(reporter(analysis, opts));
+  };
 
   let runAnalysis = (out, bundle, isWrite) => new Promise((resolve, reject) => {
     resolve();
@@ -122,7 +131,7 @@ const plugin = (opts = {}) => {
     let modules = bundle.modules;
 
     if (Array.isArray(modules)) {
-      return analyze({modules}, opts, !opts.onAnalysis).then(cb)
+      return analyze({modules}, opts).then(onAnalysis)
     }
 
     modules = Object.keys(modules).map((k) => {
@@ -131,7 +140,7 @@ const plugin = (opts = {}) => {
       module.unusedExports = module.removedExports;
       return module
     });
-    return analyze({modules}, opts, !opts.onAnalysis).then(cb)
+    return analyze({modules}, opts).then(onAnalysis)
   });
 
   return {
@@ -148,6 +157,7 @@ const plugin = (opts = {}) => {
   }
 };
 
+exports.reporter = reporter;
 exports.analyze = analyze;
 exports.formatted = formatted;
 exports.plugin = plugin;
