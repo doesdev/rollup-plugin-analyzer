@@ -199,4 +199,34 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
       assert.is(count, 1)
     })
   }
+
+  if (version === 'latest') {
+    test(`${version}: plugin shouldn't cause much overhead`, async (assert) => {
+      let start
+      let runs = 20
+      let msDiffThreshold = 50
+
+      // bundle without plugin in use
+      start = Date.now()
+      for (let i = 0; i < runs; i++) {
+        let bundle = await rollup(opts)
+        await bundle.generate({format: 'cjs'})
+      }
+      let noPlugin = (Date.now() - start) / runs
+
+      // now with the plugin
+      let count = 0
+      let writeTo = (r) => ++count
+      let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, opts)
+      start = Date.now()
+      for (let i = 0; i < runs; i++) {
+        let bundle = await rollup(rollOpts)
+        await bundle.generate({format: 'cjs'})
+      }
+      let withPlugin = (Date.now() - start) / runs
+
+      assert.is(count, runs)
+      assert.true((withPlugin - noPlugin) < msDiffThreshold)
+    })
+  }
 })
