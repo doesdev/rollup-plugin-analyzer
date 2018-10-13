@@ -161,7 +161,10 @@ dependents:      1
           - **reduction** *(Number)* - percentage of rendered size reduction
           - **usedExports** *(Array)* - list of used named exports
           - **unusedExports** *(Array)* - list of unused named exports
-
+- **htmlReportPath** - *optional*
+  - type: String
+  - default: `null`
+  - description: Write HTML report to this path
 
 ## Other considerations
 
