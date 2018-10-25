@@ -103,10 +103,10 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.is((await analyze(bundle, { filter: hasMatch })).modules.length, 1)
   })
 
-  test.failing(`${version}: transformModuleId works`, async (assert) => {
+  test(`${version}: transformModuleId works`, async (assert) => {
     let bundle = await rollup(opts)
-    let transformModuleId = (id) => `transformed-${id}`
-    let expect = `transformed-import-a`
+    let transformModuleId = (id) => `transformed-${basename(id)}`
+    let expect = `transformed-import-a.js`
     let modules = (await analyze(bundle, { transformModuleId })).modules
     let firstModule = basename(modules[0].id)
     assert.is(firstModule, expect)

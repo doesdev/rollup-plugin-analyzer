@@ -59,8 +59,9 @@ export const reporter = (analysis, opts) => {
 }
 
 const analyzer = (bundle, opts = {}) => {
-  let { root, limit, filter } = opts
+  let { root, limit, filter, transformModuleId } = opts
   root = root || (process && process.cwd ? process.cwd() : null)
+  if (typeof transformModuleId !== 'function') transformModuleId = undefined
   let deps = {}
   let bundleSize = 0
   let bundleOrigSize = 0
@@ -77,6 +78,7 @@ const analyzer = (bundle, opts = {}) => {
       unusedExports
     } = m
     id = id.replace(root, '')
+    if (transformModuleId) id = transformModuleId(id)
     let size = renderedLength
     if (!size && size !== 0) size = code ? Buffer.byteLength(code, 'utf8') : 0
     bundleSize += size
@@ -87,6 +89,7 @@ const analyzer = (bundle, opts = {}) => {
 
     m.dependencies.forEach((d) => {
       d = d.replace(root, '')
+      if (transformModuleId) d = transformModuleId(d)
       deps[d] = deps[d] || []
       deps[d].push(id)
     })
@@ -128,7 +131,9 @@ export const plugin = (opts = {}) => {
 
   let onAnalysis = (analysis) => {
     if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis)
-    if (typeof opts.htmlReportPath === 'string') writeHtmlReport(analysis.modules, opts.htmlReportPath)
+    if (typeof opts.htmlReportPath === 'string') {
+      writeHtmlReport(analysis.modules, opts.htmlReportPath)
+    }
     if (!opts.skipFormatted) writeTo(reporter(analysis, opts))
   }
 
