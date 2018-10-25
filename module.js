@@ -91,7 +91,7 @@ const analyzer = (bundle, opts = {}) => {
       deps[d].push(id)
     })
 
-    return {id, size, origSize, usedExports, unusedExports}
+    return { id, size, origSize, usedExports, unusedExports }
   }).filter((m) => m)
 
   modules.sort((a, b) => b.size - a.size)
@@ -105,7 +105,7 @@ const analyzer = (bundle, opts = {}) => {
 
   let bundleReduction = shakenPct(bundleSize, bundleOrigSize)
 
-  return {bundleSize, bundleOrigSize, bundleReduction, modules, moduleCount}
+  return { bundleSize, bundleOrigSize, bundleReduction, modules, moduleCount }
 }
 
 export const analyze = (bundle, opts) => new Promise((resolve, reject) => {
@@ -138,7 +138,7 @@ export const plugin = (opts = {}) => {
     let modules = bundle.modules
 
     if (Array.isArray(modules)) {
-      return analyze({modules}, opts).then(onAnalysis).catch(console.error)
+      return analyze({ modules }, opts).then(onAnalysis).catch(console.error)
     }
 
     modules = Object.keys(modules).map((k) => {
@@ -147,7 +147,7 @@ export const plugin = (opts = {}) => {
       module.unusedExports = module.removedExports
       return module
     })
-    return analyze({modules}, opts).then(onAnalysis).catch(console.error)
+    return analyze({ modules }, opts).then(onAnalysis).catch(console.error)
   })
 
   return {
@@ -155,8 +155,8 @@ export const plugin = (opts = {}) => {
     transformChunk: (_a, _b, chunk) => new Promise((resolve, reject) => {
       resolve(null)
       if (!chunk || !chunk.orderedModules) return
-      chunk.orderedModules.forEach(({id, dependencies}) => {
-        depMap[id] = {id, dependencies: dependencies.map((d) => d.id)}
+      chunk.orderedModules.forEach(({ id, dependencies }) => {
+        depMap[id] = { id, dependencies: dependencies.map((d) => d.id) }
       })
     }),
     generateBundle: runAnalysis,

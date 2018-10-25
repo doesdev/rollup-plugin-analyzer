@@ -2,8 +2,9 @@
 
 // setup
 import test from 'ava'
+// import { promises as fs } from 'fs'
 import { analyze, formatted, plugin } from './../index'
-import { resolve, join } from 'path'
+import { resolve, join, basename } from 'path'
 import { rollup as rollupLatest } from 'rollup'
 import { rollup as rollup60 } from 'rollup60'
 import { rollup as rollup55 } from 'rollup55'
@@ -14,7 +15,7 @@ const skipFormatted = true
 const fixtures = resolve(__dirname, 'fixtures')
 const baseOpts = {
   input: join(fixtures, 'bundle-a.js'),
-  output: {format: 'cjs'}
+  output: { format: 'cjs' }
 }
 const oldOpts = {
   entry: join(fixtures, 'bundle-a.js'),
@@ -22,7 +23,7 @@ const oldOpts = {
 }
 const multiInputOpts = {
   input: [join(fixtures, 'bundle-a.js'), join(fixtures, 'bundle-b.js')],
-  output: {format: 'cjs', dir: join(fixtures, 'multi')}
+  output: { format: 'cjs', dir: join(fixtures, 'multi') }
 }
 const expectHeader = `
 -----------------------------
@@ -33,16 +34,16 @@ const headerLength = expectHeader.length
 
 // test against many versions of rollup
 const rollers = [
-  {rollup: rollupLatest, version: 'latest', opts: baseOpts},
-  {rollup: rollup60, version: '0.60.x', opts: baseOpts},
-  {rollup: rollup55, version: '0.55.x', opts: baseOpts, noTreeshake: true},
-  {rollup: rollup50, version: '0.50.x', opts: baseOpts, noTreeshake: true},
-  {rollup: rollup45, version: '0.45.x', opts: oldOpts, noTreeshake: true},
-  {rollup: rollup40, version: '0.40.x', opts: oldOpts, noTreeshake: true}
+  { rollup: rollupLatest, version: 'latest', opts: baseOpts },
+  { rollup: rollup60, version: '0.60.x', opts: baseOpts },
+  { rollup: rollup55, version: '0.55.x', opts: baseOpts, noTreeshake: true },
+  { rollup: rollup50, version: '0.50.x', opts: baseOpts, noTreeshake: true },
+  { rollup: rollup45, version: '0.45.x', opts: oldOpts, noTreeshake: true },
+  { rollup: rollup40, version: '0.40.x', opts: oldOpts, noTreeshake: true }
 ]
 
 // main
-rollers.forEach(({rollup, version, opts, noTreeshake}) => {
+rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
   test(`${version}: formatted returns expected string`, async (assert) => {
     let bundle = await rollup(opts)
     let results = await formatted(bundle)
@@ -71,52 +72,61 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
 
   test(`${version}: limit works`, async (assert) => {
     let bundle = await rollup(opts)
-    assert.is((await analyze(bundle, {limit: 0})).modules.length, 0)
-    assert.is((await analyze(bundle, {limit: 1})).modules.length, 1)
-    assert.is((await analyze(bundle, {limit: 0})).modules.length, 0)
+    assert.is((await analyze(bundle, { limit: 0 })).modules.length, 0)
+    assert.is((await analyze(bundle, { limit: 1 })).modules.length, 1)
+    assert.is((await analyze(bundle, { limit: 0 })).modules.length, 0)
   })
 
   test(`${version}: filter with array works`, async (assert) => {
     let bundle = await rollup(opts)
     assert.is(
-      (await analyze(bundle, {filter: ['jimmy', 'jerry']})).modules.length,
+      (await analyze(bundle, { filter: ['jimmy', 'jerry'] })).modules.length,
       0
     )
     assert.is(
-      (await analyze(bundle, {filter: ['import-a', 'jessie']})).modules.length,
+      (await analyze(bundle, { filter: ['import-a', 'jessie'] })).modules.length,
       1
     )
   })
 
   test(`${version}: filter with string works`, async (assert) => {
     let bundle = await rollup(opts)
-    assert.is((await analyze(bundle, {filter: 'jimmy'})).modules.length, 0)
-    assert.is((await analyze(bundle, {filter: 'import-b'})).modules.length, 1)
+    assert.is((await analyze(bundle, { filter: 'jimmy' })).modules.length, 0)
+    assert.is((await analyze(bundle, { filter: 'import-b' })).modules.length, 1)
   })
 
   test(`${version}: filter with callback works`, async (assert) => {
     let bundle = await rollup(opts)
     let noMatch = (m) => m.id.indexOf('jimmy') !== -1
     let hasMatch = (m) => m.id.indexOf('import-b') !== -1
-    assert.is((await analyze(bundle, {filter: noMatch})).modules.length, 0)
-    assert.is((await analyze(bundle, {filter: hasMatch})).modules.length, 1)
+    assert.is((await analyze(bundle, { filter: noMatch })).modules.length, 0)
+    assert.is((await analyze(bundle, { filter: hasMatch })).modules.length, 1)
+  })
+
+  test.failing(`${version}: transformModuleId works`, async (assert) => {
+    let bundle = await rollup(opts)
+    let transformModuleId = (id) => `transformed-${id}`
+    let expect = `transformed-import-a`
+    let modules = (await analyze(bundle, { transformModuleId })).modules
+    let firstModule = basename(modules[0].id)
+    assert.is(firstModule, expect)
   })
 
   test(`${version}: root works as expected`, async (assert) => {
     let bundle = await rollup(opts)
     assert.not(
-      join(__dirname, (await analyze(bundle, {root: 'fakepath'})).modules[0].id),
+      join(__dirname, (await analyze(bundle, { root: 'fakepath' })).modules[0].id),
       resolve(fixtures, 'import-a.js')
     )
     assert.is(
-      join(__dirname, (await analyze(bundle, {root: __dirname})).modules[0].id),
+      join(__dirname, (await analyze(bundle, { root: __dirname })).modules[0].id),
       resolve(fixtures, 'import-a.js')
     )
   })
 
   test(`${version}: it works with generated bundle as well`, async (assert) => {
     let bundle = await rollup(opts)
-    await bundle.generate({format: 'cjs'})
+    await bundle.generate({ format: 'cjs' })
     let results = await formatted(bundle)
     assert.is(typeof results, 'string')
   })
@@ -125,33 +135,41 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     let results
     let writeTo = (r) => { results = r }
     let showExports = true
-    let rollOpts = Object.assign({plugins: [plugin({writeTo, showExports})]}, opts)
+    let rollOpts = Object.assign(
+      { plugins: [plugin({ writeTo, showExports })] },
+      opts
+    )
     let bundle = await rollup(rollOpts)
-    await bundle.generate({format: 'cjs'})
+    await bundle.generate({ format: 'cjs' })
     assert.is(results.substr(0, expectHeader.length), expectHeader)
+  })
+
+  test.failing(`${version}: htmlReportPath produces report`, async (assert) => {
+    assert.true(false)
   })
 
   if (!noTreeshake) {
     test(`${version}: tree shaking is accounted for`, async (assert) => {
       let results
       let onAnalysis = (r) => { results = r.modules }
-      let plugins = [plugin({onAnalysis, skipFormatted})]
-      let rollOpts = Object.assign({}, opts, {plugins})
+      let plugins = [plugin({ onAnalysis, skipFormatted })]
+      let rollOpts = Object.assign({}, opts, { plugins })
       let bundle = await rollup(rollOpts)
-      let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
+      let output = { file: join(fixtures, 'output.js'), format: 'cjs' }
       await bundle.write(output)
       let imported = results.find((r) => r.id.indexOf('import-a') !== -1)
-      assert.is(imported.size, 27)
+      let expectSize = 27
+      assert.true(Math.abs(imported.size - expectSize) < 5)
     })
 
     test(`${version}: treeshaken bundle filters with callback`, async (assert) => {
       let results
       let filter = (m) => m.size > 2000
       let onAnalysis = (r) => { results = r.modules }
-      let plugins = [plugin({onAnalysis, filter, skipFormatted})]
-      let rollOpts = Object.assign({}, opts, {plugins})
+      let plugins = [plugin({ onAnalysis, filter, skipFormatted })]
+      let rollOpts = Object.assign({}, opts, { plugins })
       let bundle = await rollup(rollOpts)
-      let output = {file: join(fixtures, 'output.js'), format: 'cjs'}
+      let output = { file: join(fixtures, 'output.js'), format: 'cjs' }
       await bundle.write(output)
       assert.is(results.length, 1)
     })
@@ -162,10 +180,13 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     test(split1, async (assert) => {
       let results
       let writeTo = (r) => { results = r }
-      let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, multiInputOpts)
+      let rollOpts = Object.assign(
+        { plugins: [plugin({ writeTo })] },
+        multiInputOpts
+      )
       rollOpts.experimentalCodeSplitting = true
       let bundle = await rollup(rollOpts)
-      await bundle.generate({format: 'cjs'})
+      await bundle.generate({ format: 'cjs' })
       assert.is(results.substr(0, expectHeader.length), expectHeader)
     })
 
@@ -173,17 +194,17 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
     test(split2, async (assert) => {
       let results = []
       let onAnalysis = (r) => { results.push(r.modules) }
-      let plugins = [plugin({onAnalysis, skipFormatted})]
-      let rollOpts = Object.assign({}, multiInputOpts, {plugins})
+      let plugins = [plugin({ onAnalysis, skipFormatted })]
+      let rollOpts = Object.assign({}, multiInputOpts, { plugins })
       rollOpts.experimentalCodeSplitting = true
       let bundle = await rollup(rollOpts)
       await bundle.write(rollOpts.output)
 
-      let imports = [{id: 'import-a', size: 8238}, {id: 'import-b', size: 33}]
+      let imports = [{ id: 'import-a', size: 8238 }, { id: 'import-b', size: 33 }]
       imports.forEach((imp, i) => {
         let result = results[i]
         let imported = result.find((r) => r.id.indexOf(imp.id) !== -1)
-        assert.is(imported.size, imp.size)
+        assert.true(Math.abs(imported.size - imp.size) < 5)
       })
     })
 
@@ -191,10 +212,13 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
       let count = 0
       let writeTo = () => ++count
 
-      let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, multiInputOpts)
+      let rollOpts = Object.assign(
+        { plugins: [plugin({ writeTo })] },
+        multiInputOpts
+      )
       rollOpts.experimentalCodeSplitting = true
       let bundle = await rollup(rollOpts)
-      await bundle.generate({format: 'cjs'})
+      await bundle.generate({ format: 'cjs' })
 
       assert.is(count, 1)
     })
@@ -210,18 +234,18 @@ rollers.forEach(({rollup, version, opts, noTreeshake}) => {
       start = Date.now()
       for (let i = 0; i < runs; i++) {
         let bundle = await rollup(opts)
-        await bundle.generate({format: 'cjs'})
+        await bundle.generate({ format: 'cjs' })
       }
       let noPlugin = (Date.now() - start) / runs
 
       // now with the plugin
       let count = 0
       let writeTo = (r) => ++count
-      let rollOpts = Object.assign({plugins: [plugin({writeTo})]}, opts)
+      let rollOpts = Object.assign({ plugins: [plugin({ writeTo })] }, opts)
       start = Date.now()
       for (let i = 0; i < runs; i++) {
         let bundle = await rollup(rollOpts)
-        await bundle.generate({format: 'cjs'})
+        await bundle.generate({ format: 'cjs' })
       }
       let withPlugin = (Date.now() - start) / runs
 

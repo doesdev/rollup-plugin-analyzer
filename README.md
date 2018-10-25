@@ -139,13 +139,26 @@ dependents:      1
   - type: Function
   - default: `null`
   - description: Callback to be invoked with formatted string
-  - callback invoked with:
+  - function will be invoked with:
     - **analysisString** *(String)*
+- **htmlReportPath** - *optional*
+  - type: String
+  - default: `null`
+  - description: Write HTML report to this path
+- **transformModuleId** - *optional*
+  - type: Function
+  - default: `null`
+  - description: Modify module ids
+  - function will be invoked with:
+    - **id** *(String)* - path of module / rollup module id
+  - function should return:
+    - **id** *(String)* - desired final module id to display in analysis results
+  - example: `(id) => id.replace(/^\0(?:commonjs-proxy:)?/, '')`
 - **onAnalysis** - *optional*
   - type: Function
   - default: `null`
   - description: Callback to be invoked with analysis object
-  - callback invoked with:
+  - function will be invoked with:
     - **analysisObject** *(Object)*
       - **bundleSize** *(Number)* - rendered bundle size in bytes
       - **bundleOrigSize** *(Number)* - original bundle size in bytes
@@ -161,10 +174,6 @@ dependents:      1
           - **reduction** *(Number)* - percentage of rendered size reduction
           - **usedExports** *(Array)* - list of used named exports
           - **unusedExports** *(Array)* - list of unused named exports
-- **htmlReportPath** - *optional*
-  - type: String
-  - default: `null`
-  - description: Write HTML report to this path
 
 ## Other considerations
 
