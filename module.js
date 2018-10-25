@@ -132,7 +132,12 @@ export const plugin = (opts = {}) => {
   let onAnalysis = (analysis) => {
     if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis)
     if (typeof opts.htmlReportPath === 'string') {
-      writeHtmlReport(analysis.modules, opts.htmlReportPath)
+      console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!MADEITHERE!!!!!!1111111111111')
+      let rptProm = writeHtmlReport(analysis.modules, opts.htmlReportPath)
+      if (opts.onHtmlReport) {
+        rptProm.then((rp) => opts.onHtmlReport())
+        rptProm.catch((err) => opts.onHtmlReport(err))
+      }
     }
     if (!opts.skipFormatted) writeTo(reporter(analysis, opts))
   }

@@ -10,15 +10,13 @@ var fs = _interopDefault(require('fs'));
 var path = _interopDefault(require('path'));
 
 const toSizes = modules => {
-  const sizes = {};
-  for (const { id: idRaw, size } of modules) {
-    const id = idRaw.replace(/^\0(?:commonjs-proxy:)?/, '');
-    const cwd = path.dirname(id);
-    const { pkg, path: pkgPath } = readPkgUp.sync({ cwd });
-    const [name, relPath] =
-      pkg != null
-        ? [pkg.name, path.relative(path.dirname(pkgPath), id)]
-        : ['(unknown)', id];
+  let sizes = {};
+  for (let { id, size } of modules) {
+    let cwd = path.dirname(id);
+    let { pkg, path: pkgPath } = readPkgUp.sync({ cwd });
+    let [name, relPath] = pkg !== null
+      ? [pkg.name, path.relative(path.dirname(pkgPath), id)]
+      : ['(unknown)', id];
     sizes[name] = sizes[name] || [];
     sizes[name][relPath] = size;
   }
@@ -26,8 +24,8 @@ const toSizes = modules => {
 };
 
 const toData = sizes => {
-  const children = [];
-  for (const [name, subdata] of Object.entries(sizes)) {
+  let children = [];
+  for (let [name, subdata] of Object.entries(sizes)) {
     children.push({
       name,
       children: Object.entries(subdata).map(([name, value]) => ({
@@ -36,15 +34,12 @@ const toData = sizes => {
       }))
     });
   }
-  return {
-    name: 'root',
-    children
-  }
+  return { name: 'root', children }
 };
 
 const toHtml = sizes => {
-  const data = toData(sizes);
-  const json = JSON.stringify(data, null, 2);
+  let data = toData(sizes);
+  let json = JSON.stringify(data, null, 2);
   return `<!doctype html>
 <html>
 <head>
@@ -80,10 +75,12 @@ Sunburst()
 };
 
 const writeHtmlReport = (modules, filePath) => {
-  const sizes = toSizes(modules);
-  const html = toHtml(sizes);
-  mkdirp.sync(path.dirname(filePath));
-  fs.writeFileSync(filePath, html, 'utf8');
+  return new Promise((resolve, reject) => {
+    let sizes = toSizes(modules);
+    let html = toHtml(sizes);
+    mkdirp.sync(path.dirname(filePath));
+    fs.writeFile(filePath, html, 'utf8', (err) => err ? reject(err) : resolve());
+  })
 };
 
 const buf = ' ';
@@ -216,7 +213,12 @@ const plugin = (opts = {}) => {
   let onAnalysis = (analysis) => {
     if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis);
     if (typeof opts.htmlReportPath === 'string') {
-      writeHtmlReport(analysis.modules, opts.htmlReportPath);
+      console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!MADEITHERE!!!!!!1111111111111');
+      let rptProm = writeHtmlReport(analysis.modules, opts.htmlReportPath);
+      if (opts.onHtmlReport) {
+        rptProm.then((rp) => opts.onHtmlReport());
+        rptProm.catch((err) => opts.onHtmlReport(err));
+      }
     }
     if (!opts.skipFormatted) writeTo(reporter(analysis, opts));
   };

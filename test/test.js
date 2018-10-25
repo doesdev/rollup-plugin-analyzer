@@ -1,10 +1,9 @@
 'use strict'
 
-// setup
 import test from 'ava'
-// import { promises as fs } from 'fs'
+import { promises as fs, constants as fsConst, unlink } from 'fs'
 import { analyze, formatted, plugin } from './../index'
-import { resolve, join, basename } from 'path'
+import { resolve as resolvePath, join, basename } from 'path'
 import { rollup as rollupLatest } from 'rollup'
 import { rollup as rollup60 } from 'rollup60'
 import { rollup as rollup55 } from 'rollup55'
@@ -12,7 +11,7 @@ import { rollup as rollup50 } from 'rollup50'
 import { rollup as rollup45 } from 'rollup45'
 import { rollup as rollup40 } from 'rollup40'
 const skipFormatted = true
-const fixtures = resolve(__dirname, 'fixtures')
+const fixtures = resolvePath(__dirname, 'fixtures')
 const baseOpts = {
   input: join(fixtures, 'bundle-a.js'),
   output: { format: 'cjs' }
@@ -116,11 +115,11 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     let bundle = await rollup(opts)
     assert.not(
       join(__dirname, (await analyze(bundle, { root: 'fakepath' })).modules[0].id),
-      resolve(fixtures, 'import-a.js')
+      resolvePath(fixtures, 'import-a.js')
     )
     assert.is(
       join(__dirname, (await analyze(bundle, { root: __dirname })).modules[0].id),
-      resolve(fixtures, 'import-a.js')
+      resolvePath(fixtures, 'import-a.js')
     )
   })
 
@@ -144,8 +143,25 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.is(results.substr(0, expectHeader.length), expectHeader)
   })
 
-  test.failing(`${version}: htmlReportPath produces report`, async (assert) => {
-    assert.true(false)
+  test.failing(`${version}: htmlReportPath produces report`, (assert) => {
+    let htmlReportPath = resolvePath(__dirname, 'fixtures', 'report.html')
+
+    return new Promise((resolve, reject) => {
+      unlink(htmlReportPath, (ignored) => {
+        rollup(opts).then((bundle) => {
+          let onHtmlReport = (err, fp) => {
+            if (err) return reject(err)
+            fs.access(htmlReportPath, fsConst.F_OK, (err) => {
+              if (err) return reject(err)
+              // if we've made it here then the file is on disk
+              assert.true(true)
+              resolve()
+            })
+          }
+          analyze(bundle, { htmlReportPath, onHtmlReport })
+        })
+      })
+    })
   })
 
   if (!noTreeshake) {

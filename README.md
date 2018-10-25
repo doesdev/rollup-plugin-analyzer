@@ -145,6 +145,12 @@ dependents:      1
   - type: String
   - default: `null`
   - description: Write HTML report to this path
+- **onHtmlReport** - *optional*
+  - type: Function
+  - default: `null`
+  - description: Called when HTML report path is written to disk
+  - function will be invoked with:
+    - **error** *(Error)* - if any errors occurred writing to disk
 - **transformModuleId** - *optional*
   - type: Function
   - default: `null`
