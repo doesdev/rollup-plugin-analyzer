@@ -131,18 +131,15 @@ export const plugin = (opts = {}) => {
 
   let onAnalysis = (analysis) => {
     if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis)
+    if (!opts.skipFormatted) writeTo(reporter(analysis, opts))
     if (typeof opts.htmlReportPath === 'string') {
       let rptProm = writeHtmlReport(analysis.modules, opts.htmlReportPath)
-      if (opts.onHtmlReport) {
-        rptProm.then((rp) => opts.onHtmlReport())
-        rptProm.catch((err) => opts.onHtmlReport(err))
-      }
+      return rptProm.then(() => Promise.resolve(null)).catch(opts.onHtmlReport)
     }
-    if (!opts.skipFormatted) writeTo(reporter(analysis, opts))
+    return Promise.resolve(null)
   }
 
-  let runAnalysis = (out, bundle, isWrite) => new Promise((resolve, reject) => {
-    resolve()
+  let runAnalysis = (out, bundle, isWrite) => {
     if (out.bundle) bundle = out.bundle
     let modules = bundle.modules
 
@@ -157,7 +154,7 @@ export const plugin = (opts = {}) => {
       return module
     })
     return analyze({ modules }, opts).then(onAnalysis).catch(console.error)
-  })
+  }
 
   return {
     name: 'rollup-plugin-analyzer',
@@ -168,7 +165,7 @@ export const plugin = (opts = {}) => {
         depMap[id] = { id, dependencies: dependencies.map((d) => d.id) }
       })
     }),
-    generateBundle: runAnalysis,
+    // generateBundle: runAnalysis,
     ongenerate: runAnalysis
   }
 }

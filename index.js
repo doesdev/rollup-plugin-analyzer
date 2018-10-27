@@ -9,21 +9,20 @@ var mkdirp = _interopDefault(require('mkdirp'));
 var fs = _interopDefault(require('fs'));
 var path = _interopDefault(require('path'));
 
-const toSizes = modules => {
+const toSizes = (modules) => {
   let sizes = {};
   for (let { id, size } of modules) {
     let cwd = path.dirname(id);
     let { pkg, path: pkgPath } = readPkgUp.sync({ cwd });
-    let [name, relPath] = pkg !== null
-      ? [pkg.name, path.relative(path.dirname(pkgPath), id)]
-      : ['(unknown)', id];
-    sizes[name] = sizes[name] || [];
-    sizes[name][relPath] = size;
+    let pkgName = pkg ? pkg.name : '(unknown)';
+    let relPath = pkg ? path.relative(path.dirname(pkgPath), id) : id;
+    sizes[pkgName] = sizes[pkgName] || [];
+    sizes[pkgName][relPath] = size;
   }
   return sizes
 };
 
-const toData = sizes => {
+const toData = (sizes) => {
   let children = [];
   for (let [name, subdata] of Object.entries(sizes)) {
     children.push({
@@ -37,7 +36,7 @@ const toData = sizes => {
   return { name: 'root', children }
 };
 
-const toHtml = sizes => {
+const toHtml = (sizes) => {
   let data = toData(sizes);
   let json = JSON.stringify(data, null, 2);
   return `<!doctype html>
@@ -212,18 +211,15 @@ const plugin = (opts = {}) => {
 
   let onAnalysis = (analysis) => {
     if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis);
+    if (!opts.skipFormatted) writeTo(reporter(analysis, opts));
     if (typeof opts.htmlReportPath === 'string') {
       let rptProm = writeHtmlReport(analysis.modules, opts.htmlReportPath);
-      if (opts.onHtmlReport) {
-        rptProm.then((rp) => opts.onHtmlReport());
-        rptProm.catch((err) => opts.onHtmlReport(err));
-      }
+      return rptProm.then(() => Promise.resolve(null)).catch(opts.onHtmlReport)
     }
-    if (!opts.skipFormatted) writeTo(reporter(analysis, opts));
+    return Promise.resolve(null)
   };
 
-  let runAnalysis = (out, bundle, isWrite) => new Promise((resolve, reject) => {
-    resolve();
+  let runAnalysis = (out, bundle, isWrite) => {
     if (out.bundle) bundle = out.bundle;
     let modules = bundle.modules;
 
@@ -238,7 +234,7 @@ const plugin = (opts = {}) => {
       return module
     });
     return analyze({ modules }, opts).then(onAnalysis).catch(console.error)
-  });
+  };
 
   return {
     name: 'rollup-plugin-analyzer',
@@ -249,7 +245,7 @@ const plugin = (opts = {}) => {
         depMap[id] = { id, dependencies: dependencies.map((d) => d.id) };
       });
     }),
-    generateBundle: runAnalysis,
+    // generateBundle: runAnalysis,
     ongenerate: runAnalysis
   }
 };
