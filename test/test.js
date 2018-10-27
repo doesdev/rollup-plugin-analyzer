@@ -1,7 +1,6 @@
 'use strict'
 
 import test from 'ava'
-import { promises as fs, constants as fsConst, unlink } from 'fs'
 import { analyze, formatted, plugin } from './../index'
 import { resolve as resolvePath, join, basename } from 'path'
 import { rollup as rollupLatest } from 'rollup'
@@ -141,27 +140,6 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     let bundle = await rollup(rollOpts)
     await bundle.generate({ format: 'cjs' })
     assert.is(results.substr(0, expectHeader.length), expectHeader)
-  })
-
-  test.failing(`${version}: htmlReportPath produces report`, (assert) => {
-    let htmlReportPath = resolvePath(__dirname, 'fixtures', 'report.html')
-
-    return new Promise((resolve, reject) => {
-      unlink(htmlReportPath, (ignored) => {
-        rollup(opts).then((bundle) => {
-          let onHtmlReport = (err, fp) => {
-            if (err) return reject(err)
-            fs.access(htmlReportPath, fsConst.F_OK, (err) => {
-              if (err) return reject(err)
-              // if we've made it here then the file is on disk
-              assert.true(true)
-              resolve()
-            })
-          }
-          analyze(bundle, { htmlReportPath, onHtmlReport })
-        })
-      })
-    })
   })
 
   if (!noTreeshake) {

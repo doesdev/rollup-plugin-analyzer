@@ -1,7 +1,5 @@
 'use strict'
 
-import { writeHtmlReport } from './lib/html-report'
-
 const buf = ' '
 const tab = '  '
 const borderX = `${Array(30).join('-')}\n`
@@ -131,13 +129,6 @@ export const plugin = (opts = {}) => {
 
   let onAnalysis = (analysis) => {
     if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis)
-    if (typeof opts.htmlReportPath === 'string') {
-      let rptProm = writeHtmlReport(analysis.modules, opts.htmlReportPath)
-      if (opts.onHtmlReport) {
-        rptProm.then((rp) => opts.onHtmlReport())
-        rptProm.catch((err) => opts.onHtmlReport(err))
-      }
-    }
     if (!opts.skipFormatted) writeTo(reporter(analysis, opts))
   }
 
