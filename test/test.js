@@ -155,7 +155,9 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     let rollOpts = Object.assign({ plugins }, opts)
     let bundle = await rollup(rollOpts)
     await bundle.generate({ format: 'cjs' })
-    await assert.notThrowsAsync(fs.access(htmlReportPath, fsConst.F_OK))
+    await fs.access(htmlReportPath, fsConst.F_OK)
+    // if we made it here it didn't throw, we're good
+    assert.true(true)
   })
 
   if (!noTreeshake) {

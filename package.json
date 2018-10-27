@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/doesdev/rollup-plugin-analyzer#readme",
   "devDependencies": {
-    "ava": "1.0.0-rc.1",
+    "ava": "^0.25.0",
     "husky": "^1.1.2",
     "rollup": "latest",
     "rollup40": "npm:rollup@0.40.x",
