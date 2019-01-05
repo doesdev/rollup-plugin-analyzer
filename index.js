@@ -42,13 +42,13 @@ const reporter = (analysis, opts) => {
         formatted += `${tab}-${buf}${d.replace(root, '')}\n`;
       });
     }
-    if (showExports && m.usedExports && m.unusedExports) {
-      formatted += `used exports:   ${buf}${m.usedExports.length}\n`;
-      m.usedExports.forEach((e) => {
+    if (showExports && m.renderedExports && m.removedExports) {
+      formatted += `used exports:   ${buf}${m.renderedExports.length}\n`;
+      m.renderedExports.forEach((e) => {
         formatted += `${tab}-${buf}${e}\n`;
       });
-      formatted += `unused exports: ${buf}${m.unusedExports.length}\n`;
-      m.unusedExports.forEach((e) => {
+      formatted += `unused exports: ${buf}${m.removedExports.length}\n`;
+      m.removedExports.forEach((e) => {
         formatted += `${tab}-${buf}${e}\n`;
       });
     }
@@ -65,7 +65,7 @@ const analyzer = (bundle, opts = {}) => {
   let deps = {};
   let bundleSize = 0;
   let bundleOrigSize = 0;
-  let bundleModules = bundle.modules || [];
+  let bundleModules = bundle.modules || (bundle.cache || {}).modules || [];
   let moduleCount = bundleModules.length;
 
   let modules = bundleModules.map((m, i) => {
@@ -74,8 +74,8 @@ const analyzer = (bundle, opts = {}) => {
       originalLength: origSize,
       renderedLength,
       code,
-      usedExports,
-      unusedExports
+      renderedExports,
+      removedExports
     } = m;
     id = id.replace(root, '');
     if (transformModuleId) id = transformModuleId(id);
@@ -94,7 +94,7 @@ const analyzer = (bundle, opts = {}) => {
       deps[d].push(id);
     });
 
-    return { id, size, origSize, usedExports, unusedExports }
+    return { id, size, origSize, renderedExports, removedExports }
   }).filter((m) => m);
 
   modules.sort((a, b) => b.size - a.size);
@@ -127,42 +127,32 @@ const formatted = (bundle, opts) => new Promise((resolve, reject) => {
 
 const plugin = (opts = {}) => {
   let writeTo = opts.writeTo || (opts.stdout ? console.log : console.error);
-  let depMap = {};
 
   let onAnalysis = (analysis) => {
     if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis);
     if (!opts.skipFormatted) writeTo(reporter(analysis, opts));
   };
 
-  let runAnalysis = (out, bundle, isWrite) => new Promise((resolve, reject) => {
-    resolve();
-    if (out.bundle) bundle = out.bundle;
-    let modules = bundle.modules;
-
-    if (Array.isArray(modules)) {
-      return analyze({ modules }, opts).then(onAnalysis).catch(console.error)
-    }
-
-    modules = Object.keys(modules).map((k) => {
-      let module = Object.assign(modules[k], depMap[k] || {});
-      module.usedExports = module.renderedExports;
-      module.unusedExports = module.removedExports;
-      return module
-    });
-    return analyze({ modules }, opts).then(onAnalysis).catch(console.error)
-  });
-
   return {
     name: 'rollup-plugin-analyzer',
-    transformChunk: (_a, _b, chunk) => new Promise((resolve, reject) => {
-      resolve(null);
-      if (!chunk || !chunk.orderedModules) return
-      chunk.orderedModules.forEach(({ id, dependencies }) => {
-        depMap[id] = { id, dependencies: dependencies.map((d) => d.id) };
-      });
-    }),
-    generateBundle: runAnalysis,
-    ongenerate: runAnalysis
+    generateBundle: function (outOpts, bundle, isWrite) {
+      const ctx = this || {};
+      const getDeps = (id) => {
+        return ctx.getModuleInfo ? ctx.getModuleInfo(id).importedIds : []
+      };
+
+      return new Promise((resolve, reject) => {
+        resolve();
+        const modules = [];
+        Object.entries(bundle).forEach(([outId, { modules: bundleMods }]) => {
+          Object.entries(bundleMods).forEach(([id, moduleInfo]) => {
+            const dependencies = getDeps(id);
+            modules.push(Object.assign({}, moduleInfo, { id, dependencies }));
+          });
+        });
+        return analyze({ modules }, opts).then(onAnalysis).catch(console.error)
+      })
+    }
   }
 };
 
