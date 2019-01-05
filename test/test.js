@@ -4,6 +4,7 @@ import test from 'ava'
 import { analyze, formatted, plugin } from './../index'
 import { resolve as resolvePath, join, basename } from 'path'
 import { rollup as rollupLatest } from 'rollup'
+import { rollup as rollup60 } from 'rollup60'
 import { rollup as rollup100 } from 'rollup100'
 const skipFormatted = true
 const fixtures = resolvePath(__dirname, 'fixtures')
@@ -233,4 +234,18 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
       assert.true((withPlugin - noPlugin) < msDiffThreshold)
     })
   }
+})
+
+test(`rollup < 1.0.0 prints warning about support`, async (assert) => {
+  let results = ''
+  const oldCslErr = console.error
+  console.error = (...args) => {
+    results += args.join()
+  }
+  let rollOpts = Object.assign({ plugins: [plugin()] }, baseOpts)
+  let bundle = await rollup60(rollOpts)
+  await bundle.generate({ format: 'cjs' })
+  const expect = `rollup-plugin-analyzer: Rollup version not supported`
+  assert.is(results.split('\n')[0], expect)
+  console.error = oldCslErr
 })

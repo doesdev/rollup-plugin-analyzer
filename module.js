@@ -135,8 +135,19 @@ export const plugin = (opts = {}) => {
 
   return {
     name: 'rollup-plugin-analyzer',
+    buildStart: function () {
+      const ctx = this || {}
+      if (!ctx.meta || +(ctx.meta.rollupVersion || 0).charAt(0) < 1) {
+        const msg = `` +
+          `rollup-plugin-analyzer: Rollup version not supported\n${tab}` +
+          `Starting with 3.0.0 only Rollup >= 1.0.0 is supported\n${tab}` +
+          `Use rollup-plugin-analyzer 2.1.0 for prior Rollup versions`
+        console.error(msg)
+      }
+    },
     generateBundle: function (outOpts, bundle, isWrite) {
       const ctx = this || {}
+      if (!ctx.meta || +(ctx.meta.rollupVersion || 0).charAt(0) < 1) return null
       const getDeps = (id) => {
         return ctx.getModuleInfo ? ctx.getModuleInfo(id).importedIds : []
       }
@@ -157,3 +168,7 @@ export const plugin = (opts = {}) => {
     }
   }
 }
+
+Object.assign(plugin, { plugin, analyze, formatted, reporter })
+
+export default plugin

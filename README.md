@@ -29,7 +29,7 @@ $ npm install --save-dev rollup-plugin-analyzer
 
 ### from rollup config
 ```js
-import { plugin as analyze } from 'rollup-plugin-analyzer'
+import analyze from 'rollup-plugin-analyzer'
 
 export default {
   entry: 'module.js',
@@ -42,7 +42,7 @@ export default {
 ### from build script
 ```js
 import { rollup } from 'rollup'
-import { plugin as analyze } from 'rollup-plugin-analyzer'
+import analyze from 'rollup-plugin-analyzer'
 
 rollup({
   entry: 'main.js',
@@ -53,7 +53,7 @@ rollup({
 ### CI usage example
 ```js
 import { rollup } from 'rollup'
-import { plugin as analyze } from 'rollup-plugin-analyzer'
+import analyze from 'rollup-plugin-analyzer'
 const limitBytes = 1e6
 
 const onAnalysis = ({bundleSize}) => {

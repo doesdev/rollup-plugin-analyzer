@@ -1,9 +1,9 @@
 'use strict'
 
-import { plugin } from './module'
+import analyzer from './module'
 
 export default {
-  plugins: [plugin()],
+  plugins: [analyzer()],
   input: 'module.js',
   output: {
     file: 'index.js',
