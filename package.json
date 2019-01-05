@@ -11,7 +11,7 @@
   "scripts": {
     "test": "node ./node_modules/rollup/bin/rollup -c && ava --verbose --failFast --serial",
     "precommit": "node ./node_modules/rollup/bin/rollup -c && ava && git add index.js",
-    "changelog": "auto-changelog -u -l 50 && git add CHANGELOG.md"
+    "changelog": "auto-changelog --commit-limit false && git add CHANGELOG.md"
   },
   "repository": {
     "type": "git",
