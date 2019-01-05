@@ -7,10 +7,10 @@ const tab = '  ';
 const borderX = `${Array(30).join('-')}\n`;
 const formatBytes = (bytes) => {
   if (bytes === 0) return '0 Byte'
-  let k = 1000;
-  let dm = 3;
-  let sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  let i = Math.floor(Math.log(bytes) / Math.log(k));
+  const k = 1000;
+  const dm = 3;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 };
 const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0);
@@ -36,7 +36,7 @@ const reporter = (analysis, opts) => {
       `code reduction: ${buf}${m.reduction} %\n` +
       `dependents:     ${buf}${m.dependents.length}\n`;
 
-    let { hideDeps, root, showExports } = opts || {};
+    const { hideDeps, root, showExports } = opts || {};
     if (!hideDeps) {
       m.dependents.forEach((d) => {
         formatted += `${tab}-${buf}${d.replace(root, '')}\n`;
@@ -62,11 +62,13 @@ const analyzer = (bundle, opts = {}) => {
   let { root, limit, filter, transformModuleId } = opts;
   root = root || (process && process.cwd ? process.cwd() : null);
   if (typeof transformModuleId !== 'function') transformModuleId = undefined;
-  let deps = {};
+
+  const deps = {};
+  const bundleModules = bundle.modules || (bundle.cache || {}).modules || [];
+  const moduleCount = bundleModules.length;
+
   let bundleSize = 0;
   let bundleOrigSize = 0;
-  let bundleModules = bundle.modules || (bundle.cache || {}).modules || [];
-  let moduleCount = bundleModules.length;
 
   let modules = bundleModules.map((m, i) => {
     let {
@@ -113,22 +115,22 @@ const analyzer = (bundle, opts = {}) => {
 
 const analyze = (bundle, opts) => new Promise((resolve, reject) => {
   try {
-    let analysis = analyzer(bundle, opts);
+    const analysis = analyzer(bundle, opts);
     return resolve(analysis)
   } catch (ex) { return reject(ex) }
 });
 
 const formatted = (bundle, opts) => new Promise((resolve, reject) => {
   try {
-    let analysis = analyzer(bundle, opts);
+    const analysis = analyzer(bundle, opts);
     return resolve(reporter(analysis, opts))
   } catch (ex) { return resolve(ex.toString()) }
 });
 
 const plugin = (opts = {}) => {
-  let writeTo = opts.writeTo || (opts.stdout ? console.log : console.error);
+  const writeTo = opts.writeTo || (opts.stdout ? console.log : console.error);
 
-  let onAnalysis = (analysis) => {
+  const onAnalysis = (analysis) => {
     if (typeof opts.onAnalysis === 'function') opts.onAnalysis(analysis);
     if (!opts.skipFormatted) writeTo(reporter(analysis, opts));
   };
@@ -143,6 +145,7 @@ const plugin = (opts = {}) => {
 
       return new Promise((resolve, reject) => {
         resolve();
+
         const modules = [];
         Object.entries(bundle).forEach(([outId, { modules: bundleMods }]) => {
           Object.entries(bundleMods).forEach(([id, moduleInfo]) => {
@@ -150,6 +153,7 @@ const plugin = (opts = {}) => {
             modules.push(Object.assign({}, moduleInfo, { id, dependencies }));
           });
         });
+
         return analyze({ modules }, opts).then(onAnalysis).catch(console.error)
       })
     }
