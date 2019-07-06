@@ -6,21 +6,26 @@ import { resolve as resolvePath, join, basename } from 'path'
 import { rollup as rollupLatest } from 'rollup'
 import { rollup as rollup60 } from 'rollup60'
 import { rollup as rollup100 } from 'rollup100'
+
 const skipFormatted = true
 const fixtures = resolvePath(__dirname, 'fixtures')
+
 const baseOpts = {
   input: join(fixtures, 'bundle-a.js'),
   output: { format: 'cjs' }
 }
+
 const multiInputOpts = {
   input: [join(fixtures, 'bundle-a.js'), join(fixtures, 'bundle-b.js')],
   output: { format: 'cjs', dir: join(fixtures, 'multi') }
 }
+
 const expectHeader = `
 -----------------------------
 Rollup File Analysis
 -----------------------------
 `.trim()
+
 const headerLength = expectHeader.length
 
 // test against many versions of rollup

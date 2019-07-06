@@ -78,30 +78,50 @@ bundle size:    2.809 KB
 original size:  11.384 KB
 code reduction: 75.33 %
 module count:   5
------------------------------
-file:            \test\fixtures\import-d.js
+
+█████████████████████████████████████████████░░░░░
+file:            \import-d.js
 bundle space:    90.64 %
 rendered size:   2.546 KB
 original size:   2.57 KB
 code reduction:  0.93 %
 dependents:      1
-  - \test\fixtures\import-c.js
------------------------------
-file:            \test\fixtures\bundle.js
+  - \import-c.js
+
+██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+file:            \bundle-a.js
 bundle space:    4.27 %
 rendered size:   120 Bytes
 original size:   267 Bytes
 code reduction:  55.06 %
 dependents:      0
------------------------------
-file:            \test\fixtures\import-c.js
+
+█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+file:            \import-c.js
 bundle space:    2.95 %
 rendered size:   83 Bytes
 original size:   161 Bytes
 code reduction:  48.45 %
 dependents:      1
-  - \test\fixtures\import-b.js
+  - \import-b.js
 ...
+```
+
+### results (with `summaryOnly` enabled)
+```sh
+-----------------------------
+Rollup File Analysis
+-----------------------------
+bundle size:    2.809 KB
+original size:  11.384 KB
+code reduction: 75.33 %
+module count:   5
+
+███████████████████\import-d.js██████████████░░░░░ 90.64 %
+██░░░░░░░░░░░░░░░░░\bundle-a.js░░░░░░░░░░░░░░░░░░░ 4.27 %
+█░░░░░░░░░░░░░░░░░░\import-c.js░░░░░░░░░░░░░░░░░░░ 2.95 %
+░░░░░░░░░░░░░░░░░░░\import-b.js░░░░░░░░░░░░░░░░░░░ 1.17 %
+░░░░░░░░░░░░░░░░░░░\import-a.js░░░░░░░░░░░░░░░░░░░ 0.96 %
 ```
 
 ## Options
@@ -117,7 +137,8 @@ dependents:      1
 - **filter** - *optional*
   - type: Array | String | Function
   - default: `null`
-  - description: Filter to only show imports matching the specified name(s)
+  - description: Filter module to output in analysis results.
+    - If a string is passed, checks if module name contains the string. If array it checks the same for each string in the array. If function, return a boolean to indicate if a module should be in analysis results.
   - notes: Function receives `module` object specified below, should return boolean
 - **root** - *optional*
   - type: String
@@ -131,6 +152,10 @@ dependents:      1
   - type: Boolean
   - default: `false`
   - description: Show used and unused exports
+- **summaryOnly** - *optional*
+  - type: Boolean
+  - default: `false`
+  - description: Only output bundle summary and module usage bar graphs
 - **skipFormatted** - *optional*
   - type: Boolean
   - default: `false`

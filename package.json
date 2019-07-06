@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-analyzer",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Mad metrics for your rollup bundles, know all the things",
   "main": "index.js",
   "module": "module.js",
@@ -9,8 +9,8 @@
     "module.js"
   ],
   "scripts": {
-    "test": "node ./node_modules/rollup/bin/rollup -c && ava --verbose --failFast --serial test/test.js",
-    "precommit": "node ./node_modules/rollup/bin/rollup -c && npm test && git add index.js",
+    "test": "standard module.js && node ./node_modules/rollup/bin/rollup -c && ava --verbose --failFast --serial test/test.js",
+    "precommit": "standard module.js && node ./node_modules/rollup/bin/rollup -c && npm test && git add index.js",
     "changelog": "auto-changelog --commit-limit false && git add CHANGELOG.md"
   },
   "repository": {
@@ -37,13 +37,14 @@
   "bugs": {
     "url": "https://github.com/doesdev/rollup-plugin-analyzer/issues"
   },
-  "homepage": "https://github.com/doesdev/rollup-plugin-analyzer#readme",
+  "homepage": "http://rollup-plugin-analyzer.doesdev.com/",
   "devDependencies": {
-    "ava": "^2.0.0",
-    "husky": "^2.3.0",
+    "ava": "^2.1.0",
+    "husky": "^3.0.0",
     "rollup": "npm:rollup@latest",
+    "rollup100": "npm:rollup@1.0.x",
     "rollup60": "npm:rollup@0.60.x",
-    "rollup100": "npm:rollup@1.0.x"
+    "standard": "^12.0.1"
   },
   "dependencies": {}
 }

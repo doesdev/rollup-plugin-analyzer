@@ -15,6 +15,8 @@ const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0)
 const match = (str, check) => str.indexOf(check) !== -1
 
 export const reporter = (analysis, opts) => {
+  const { hideDeps, root, showExports, summaryOnly } = opts || {}
+
   let formatted = `` +
     `${borderX}` +
     `Rollup File Analysis\n` +
@@ -23,10 +25,23 @@ export const reporter = (analysis, opts) => {
     `original size:  ${formatBytes(analysis.bundleOrigSize)}\n` +
     `code reduction: ${analysis.bundleReduction} %\n` +
     `module count:   ${analysis.moduleCount}\n` +
-    `${borderX}`
+    `\n`
 
-  analysis.modules.forEach((m) => {
-    formatted += `` +
+  analysis.modules.forEach((m, i) => {
+    const percentInt = parseInt(m.percent, 10)
+    const percentFilled = (percentInt ? parseInt(percentInt / 2, 10) : 0) + 1
+    const percentEmpty = 52 - percentFilled
+    const barFilled = `${Array(percentFilled).join('\u2588')}`
+    const barEmpty = `${Array(percentEmpty).join('\u2591')}`
+    const rawBar = `${barFilled}${barEmpty}`
+    const bar = !summaryOnly ? rawBar : `` +
+      `${rawBar.slice(0, 25 - (m.id.length / 2))}` +
+      `${m.id}` +
+      `${rawBar.slice((m.id.length / 2) - 25)} ` +
+      `${m.percent} %`
+
+    formatted += summaryOnly ? `${bar}\n` : `` +
+      `${bar}\n` +
       `file:           ${buf}${m.id}\n` +
       `bundle space:   ${buf}${m.percent} %\n` +
       `rendered size:  ${buf}${formatBytes(m.size)}\n` +
@@ -34,13 +49,13 @@ export const reporter = (analysis, opts) => {
       `code reduction: ${buf}${m.reduction} %\n` +
       `dependents:     ${buf}${m.dependents.length}\n`
 
-    const { hideDeps, root, showExports } = opts || {}
-    if (!hideDeps) {
+    if (!hideDeps && !summaryOnly) {
       m.dependents.forEach((d) => {
         formatted += `${tab}-${buf}${d.replace(root, '')}\n`
       })
     }
-    if (showExports && m.renderedExports && m.removedExports) {
+
+    if (showExports && m.renderedExports && m.removedExports && !summaryOnly) {
       formatted += `used exports:   ${buf}${m.renderedExports.length}\n`
       m.renderedExports.forEach((e) => {
         formatted += `${tab}-${buf}${e}\n`
@@ -50,7 +65,8 @@ export const reporter = (analysis, opts) => {
         formatted += `${tab}-${buf}${e}\n`
       })
     }
-    formatted += `${borderX}`
+
+    formatted += summaryOnly ? '' : `\n`
   })
 
   return formatted
