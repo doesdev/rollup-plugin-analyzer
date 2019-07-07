@@ -40,4 +40,5 @@ jspm_packages
 # Output files
 test/fixtures/output.js
 test/fixtures/multi
-test/fixtures/report.html
+output/*
+!output/.gitkeep
