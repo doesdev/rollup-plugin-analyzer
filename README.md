@@ -75,35 +75,35 @@ logged to console on rollup completion
 Rollup File Analysis
 -----------------------------
 bundle size:    2.809 KB
-original size:  11.384 KB
-code reduction: 75.33 %
+original size:  11.436 KB
+code reduction: 75.44 %
 module count:   5
 
 █████████████████████████████████████████████░░░░░
-file:            \import-d.js
+file:            /virtual-insanity.js
 bundle space:    90.64 %
 rendered size:   2.546 KB
 original size:   2.57 KB
 code reduction:  0.93 %
 dependents:      1
-  - \import-c.js
+  - /jamiroquai.js
 
 ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-file:            \bundle-a.js
+file:            /bundle-a.js
 bundle space:    4.27 %
 rendered size:   120 Bytes
-original size:   267 Bytes
-code reduction:  55.06 %
+original size:   309 Bytes
+code reduction:  61.17 %
 dependents:      0
 
 █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-file:            \import-c.js
+file:            /jamiroquai.js
 bundle space:    2.95 %
 rendered size:   83 Bytes
-original size:   161 Bytes
-code reduction:  48.45 %
+original size:   169 Bytes
+code reduction:  50.89 %
 dependents:      1
-  - \import-b.js
+  - /the-alphabet-but-incomplete.js
 ...
 ```
 
@@ -113,15 +113,20 @@ dependents:      1
 Rollup File Analysis
 -----------------------------
 bundle size:    2.809 KB
-original size:  11.384 KB
-code reduction: 75.33 %
+original size:  11.436 KB
+code reduction: 75.44 %
 module count:   5
 
-███████████████████\import-d.js██████████████░░░░░ 90.64 %
-██░░░░░░░░░░░░░░░░░\bundle-a.js░░░░░░░░░░░░░░░░░░░ 4.27 %
-█░░░░░░░░░░░░░░░░░░\import-c.js░░░░░░░░░░░░░░░░░░░ 2.95 %
-░░░░░░░░░░░░░░░░░░░\import-b.js░░░░░░░░░░░░░░░░░░░ 1.17 %
-░░░░░░░░░░░░░░░░░░░\import-a.js░░░░░░░░░░░░░░░░░░░ 0.96 %
+/virtual-insanity.js
+█████████████████████████████████████████████░░░░░ 90.64 % (2.546 KB)
+/bundle-a.js
+██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 4.27 % (120 Bytes)
+/jamiroquai.js
+█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 2.95 % (83 Bytes)
+/the-alphabet-but-incomplete.js
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 1.17 % (33 Bytes)
+/the-declaration-of-independence.js
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0.96 % (27 Bytes)
 ```
 
 ## Options

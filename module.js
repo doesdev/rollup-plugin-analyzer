@@ -28,33 +28,29 @@ export const reporter = (analysis, opts) => {
     `\n`
 
   analysis.modules.forEach((m, i) => {
+    const id = m.id.replace(/\\/g, '/')
+    const size = formatBytes(m.size)
     const percentInt = parseInt(m.percent, 10)
     const percentFilled = (percentInt ? parseInt(percentInt / 2, 10) : 0) + 1
     const percentEmpty = 52 - percentFilled
     const barFilled = `${Array(percentFilled).join('\u2588')}`
     const barEmpty = `${Array(percentEmpty).join('\u2591')}`
     const rawBar = `${barFilled}${barEmpty}`
-    const idEscaped = m.id.replace(/\\/g, '/')
-    const idHalf = parseInt(idEscaped.length / 2, 10)
-    const bar = (!summaryOnly ? rawBar : `` +
-      `${rawBar.slice(0, 25 - idHalf)}` +
-      `${idEscaped}` +
-      `${rawBar.slice((idEscaped.length - idHalf) - 25)} ` +
-      `${m.percent} %`
-    )
+    const summaryBar = `${id}\n${rawBar} ${m.percent} % (${size})`
+    const bar = !summaryOnly ? rawBar : summaryBar
 
     formatted += summaryOnly ? `${bar}\n` : `` +
       `${bar}\n` +
-      `file:           ${buf}${m.id}\n` +
+      `file:           ${buf}${id}\n` +
       `bundle space:   ${buf}${m.percent} %\n` +
-      `rendered size:  ${buf}${formatBytes(m.size)}\n` +
+      `rendered size:  ${buf}${size}\n` +
       `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n` +
       `code reduction: ${buf}${m.reduction} %\n` +
       `dependents:     ${buf}${m.dependents.length}\n`
 
     if (!hideDeps && !summaryOnly) {
       m.dependents.forEach((d) => {
-        formatted += `${tab}-${buf}${d.replace(root, '')}\n`
+        formatted += `${tab}-${buf}${d.replace(root, '').replace(/\\/g, '/')}\n`
       })
     }
 
