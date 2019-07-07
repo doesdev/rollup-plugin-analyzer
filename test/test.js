@@ -9,6 +9,8 @@ import { rollup as rollup100 } from 'rollup100'
 
 const skipFormatted = true
 const fixtures = resolvePath(__dirname, 'fixtures')
+const importA = 'the-declaration-of-independence'
+const importB = 'the-alphabet-but-incomplete'
 
 const baseOpts = {
   input: join(fixtures, 'bundle-a.js'),
@@ -76,7 +78,7 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
       0
     )
     assert.is(
-      (await analyze(bundle, { filter: ['import-a', 'jessie'] })).modules.length,
+      (await analyze(bundle, { filter: [importA, 'jessie'] })).modules.length,
       1
     )
   })
@@ -84,13 +86,13 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
   test(`${version}: filter with string works`, async (assert) => {
     let bundle = await rollup(opts)
     assert.is((await analyze(bundle, { filter: 'jimmy' })).modules.length, 0)
-    assert.is((await analyze(bundle, { filter: 'import-b' })).modules.length, 1)
+    assert.is((await analyze(bundle, { filter: importB })).modules.length, 1)
   })
 
   test(`${version}: filter with callback works`, async (assert) => {
     let bundle = await rollup(opts)
     let noMatch = (m) => m.id.indexOf('jimmy') !== -1
-    let hasMatch = (m) => m.id.indexOf('import-b') !== -1
+    let hasMatch = (m) => m.id.indexOf(importB) !== -1
     assert.is((await analyze(bundle, { filter: noMatch })).modules.length, 0)
     assert.is((await analyze(bundle, { filter: hasMatch })).modules.length, 1)
   })
@@ -98,7 +100,7 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
   test(`${version}: transformModuleId works`, async (assert) => {
     let bundle = await rollup(opts)
     let transformModuleId = (id) => `transformed-${basename(id)}`
-    let expect = `transformed-import-a.js`
+    let expect = `transformed-${importA}.js`
     let modules = (await analyze(bundle, { transformModuleId })).modules
     let firstModule = basename(modules[0].id)
     assert.is(firstModule, expect)
@@ -108,11 +110,11 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     let bundle = await rollup(opts)
     assert.not(
       join(__dirname, (await analyze(bundle, { root: 'fakepath' })).modules[0].id),
-      resolvePath(fixtures, 'import-a.js')
+      resolvePath(fixtures, `${importA}.js`)
     )
     assert.is(
       join(__dirname, (await analyze(bundle, { root: __dirname })).modules[0].id),
-      resolvePath(fixtures, 'import-a.js')
+      resolvePath(fixtures, `${importA}.js`)
     )
   })
 
@@ -136,6 +138,25 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.is(results.substr(0, expectHeader.length), expectHeader)
   })
 
+  test(`${version}: summaryOnly bar graphs as expected`, async (assert) => {
+    let results
+    let writeTo = (r) => { results = r }
+    let rollOpts = Object.assign(
+      { plugins: [plugin({ writeTo, summaryOnly: true, root: fixtures })] },
+      opts
+    )
+    let bundle = await rollup(rollOpts)
+    await bundle.generate({ format: 'cjs' })
+
+    const bars = results.split('\n').filter((t) => {
+      return t.indexOf('\u2591') !== -1 || t.indexOf('\u2588') !== -1
+    }).map((t) => t.split(' ')[0])
+
+    const barLengths = bars.map((t) => t.trim().length)
+
+    assert.deepEqual(barLengths, bars.map(() => 50))
+  })
+
   test(`${version}: tree shaking is accounted for`, async (assert) => {
     let results
     let onAnalysis = (r) => { results = r.modules }
@@ -144,7 +165,7 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     let bundle = await rollup(rollOpts)
     let output = { file: join(fixtures, 'output.js'), format: 'cjs' }
     await bundle.write(output)
-    let imported = results.find((r) => r.id.indexOf('import-a') !== -1)
+    let imported = results.find((r) => r.id.indexOf(importA) !== -1)
     let expectSize = 27
     assert.true(Math.abs(imported.size - expectSize) < 5)
   })
@@ -186,7 +207,7 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
       let bundle = await rollup(rollOpts)
       await bundle.write(rollOpts.output)
 
-      let imports = [{ id: 'import-a', size: 8238 }, { id: 'import-b', size: 33 }]
+      let imports = [{ id: importA, size: 8238 }, { id: importB, size: 33 }]
       imports.forEach((imp, i) => {
         let result = results[i]
         let imported = result.find((r) => r.id.indexOf(imp.id) !== -1)

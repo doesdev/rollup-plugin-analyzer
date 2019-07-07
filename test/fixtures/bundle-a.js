@@ -1,11 +1,11 @@
 'use strict'
 
-import { aSmallConst } from './import-a'
+import { aSmallConst } from './the-declaration-of-independence'
 import {
   anotherSmallConst,
   smallNestedConstA,
   largeNestedConstB
-} from './import-b'
+} from './the-alphabet-but-incomplete'
 
 console.log(
   aSmallConst.length,

@@ -36,11 +36,14 @@ const reporter = (analysis, opts) => {
     const barFilled = `${Array(percentFilled).join('\u2588')}`;
     const barEmpty = `${Array(percentEmpty).join('\u2591')}`;
     const rawBar = `${barFilled}${barEmpty}`;
-    const bar = !summaryOnly ? rawBar : `` +
-      `${rawBar.slice(0, 25 - (m.id.length / 2))}` +
-      `${m.id}` +
-      `${rawBar.slice((m.id.length / 2) - 25)} ` +
-      `${m.percent} %`;
+    const idEscaped = m.id.replace(/\\/g, '/');
+    const idHalf = parseInt(idEscaped.length / 2, 10);
+    const bar = (!summaryOnly ? rawBar : `` +
+      `${rawBar.slice(0, 25 - idHalf)}` +
+      `${idEscaped}` +
+      `${rawBar.slice((idEscaped.length - idHalf) - 25)} ` +
+      `${m.percent} %`
+    );
 
     formatted += summaryOnly ? `${bar}\n` : `` +
       `${bar}\n` +
