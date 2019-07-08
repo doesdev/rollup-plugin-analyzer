@@ -6,8 +6,7 @@
   "module": "module.js",
   "files": [
     "index.js",
-    "module.js",
-    "output/.gitkeep"
+    "module.js"
   ],
   "scripts": {
     "test": "standard module.js && node ./node_modules/rollup/bin/rollup -c && ava --verbose --failFast --serial test/test.js",
