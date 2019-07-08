@@ -9,33 +9,90 @@ const height = maxSize - 20
 const radius = Math.min(width, height) / 2
 const color = d3.scaleOrdinal(d3.schemeCategory20b)
 
-const data = {
-  name: 'TOPICS',
-  children: [
+const analysis = {
+  bundleSize: 2809,
+  bundleOrigSize: 11436,
+  bundleReduction: 75.44,
+  modules: [
     {
-      name: 'Topic A',
-      children: [
-        { name: 'Sub A1', size: 4 },
-        { name: 'Sub A2', size: 4 }
-      ]
+      id: '\\virtual-insanity.js',
+      size: 2546,
+      origSize: 2570,
+      renderedExports: ['virtualInsanity'],
+      removedExports: [],
+      dependents: ['\\jamiroquai.js'],
+      percent: 90.64,
+      reduction: 0.93
     },
     {
-      name: 'Topic B',
-      children: [
-        { name: 'Sub B1', size: 3 },
-        { name: 'Sub B2', size: 3 },
-        { name: 'Sub B3', size: 3 }
-      ]
+      id: '\\bundle-a.js',
+      size: 120,
+      origSize: 309,
+      renderedExports: [],
+      removedExports: [],
+      dependents: [],
+      percent: 4.27,
+      reduction: 61.17
     },
     {
-      name: 'Topic C',
-      children: [
-        { name: 'Sub A1', size: 4 },
-        { name: 'Sub A2', size: 4 }
-      ]
+      id: '\\jamiroquai.js',
+      size: 83,
+      origSize: 169,
+      renderedExports: ['smallNestedConstA', 'largeNestedConstB'],
+      removedExports: [],
+      dependents: ['\\the-alphabet-but-incomplete.js'],
+      percent: 2.95,
+      reduction: 50.89
+    },
+    {
+      id: '\\the-alphabet-but-incomplete.js',
+      size: 33,
+      origSize: 123,
+      renderedExports: ['anotherSmallConst'],
+      removedExports: [],
+      dependents: ['\\bundle-a.js'],
+      percent: 1.17,
+      reduction: 73.17
+    },
+    {
+      id: '\\the-declaration-of-independence.js',
+      size: 27,
+      origSize: 8265,
+      renderedExports: ['aSmallConst'],
+      removedExports: ['aLargeConst'],
+      dependents: ['\\bundle-a.js'],
+      percent: 0.96,
+      reduction: 99.67
     }
-  ]
+  ],
+  moduleCount: 5
 }
+
+let rootModule
+const depTree = {}
+analysis.modules.forEach((m) => {
+  if (!m.dependents.length) rootModule = m
+  m.dependents.forEach((d) => (depTree[d] = depTree[d] || []).push(m))
+})
+
+const data = {
+  name: rootModule.id,
+  children: []
+}
+
+const addChild = (parent, m) => {
+  const { id: name, size } = m
+  const tree = depTree[name]
+  const el = tree ? { name, children: [] } : { name, size }
+  parent.children = parent.children || []
+  parent.children.push(el)
+
+  if (tree) tree.forEach((d) => addChild(el, d))
+
+  return el
+}
+
+depTree[data.name].forEach((d) => addChild(data, d))
 
 const renderSunburst = (nodeData) => {
   const svg = d3.select('svg')
