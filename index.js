@@ -74,7 +74,8 @@ const reporter = (analysis, opts) => {
 };
 
 const analyzer = (bundle, opts = {}) => {
-  let { root, limit, filter, transformModuleId } = opts;
+  const { limit, filter } = opts;
+  let { root, transformModuleId } = opts;
   root = root || (process && process.cwd ? process.cwd() : null);
   if (typeof transformModuleId !== 'function') transformModuleId = undefined;
 
@@ -86,14 +87,14 @@ const analyzer = (bundle, opts = {}) => {
   let bundleOrigSize = 0;
 
   let modules = bundleModules.map((m, i) => {
-    let {
-      id,
+    const {
       originalLength: origSize,
       renderedLength,
       code,
       renderedExports,
       removedExports
     } = m;
+    let { id } = m;
     id = id.replace(root, '');
     if (transformModuleId) id = transformModuleId(id);
     let size = renderedLength;
@@ -123,7 +124,7 @@ const analyzer = (bundle, opts = {}) => {
   });
   if (typeof filter === 'function') modules = modules.filter(filter);
 
-  let bundleReduction = shakenPct(bundleSize, bundleOrigSize);
+  const bundleReduction = shakenPct(bundleSize, bundleOrigSize);
 
   return { bundleSize, bundleOrigSize, bundleReduction, modules, moduleCount }
 };
