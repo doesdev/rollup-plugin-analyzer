@@ -44,7 +44,7 @@
     "rollup": "npm:rollup@latest",
     "rollup100": "npm:rollup@1.0.x",
     "rollup60": "npm:rollup@0.60.x",
-    "standard": "^13.0.0"
+    "standard": "^13.0.2"
   },
   "dependencies": {}
 }
