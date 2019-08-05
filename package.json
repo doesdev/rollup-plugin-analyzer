@@ -10,8 +10,7 @@
   ],
   "scripts": {
     "test": "standard module.js && node ./node_modules/rollup/dist/bin/rollup -c && node test/test.js --verbose",
-    "precommit": "standard module.js && node ./node_modules/rollup/dist/bin/rollup -c && node test/test.js --verbose && git add index.js",
-    "changelog": "auto-changelog --commit-limit false && git add CHANGELOG.md"
+    "precommit": "standard module.js && node ./node_modules/rollup/dist/bin/rollup -c && node test/test.js --verbose && git add index.js"
   },
   "repository": {
     "type": "git",
