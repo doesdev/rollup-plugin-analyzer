@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+### Unreleased
+
+- Update yarn lockfile using latest Rollup version
+- Correct path to latest Rollup version under scripts
+
 ### [3.1.2](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.1.1...3.1.2)
 
 > 14 July 2019
