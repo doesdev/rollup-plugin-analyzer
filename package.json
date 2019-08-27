@@ -2,6 +2,7 @@
   "name": "rollup-plugin-analyzer",
   "version": "3.1.2",
   "description": "Mad metrics for your rollup bundles, know all the things",
+  "engines" : { "node" : ">=8.0.0" },
   "main": "index.js",
   "module": "module.js",
   "files": [
@@ -38,12 +39,12 @@
   },
   "homepage": "http://rollup-plugin-analyzer.doesdev.com/",
   "devDependencies": {
-    "husky": "^3.0.0",
-    "mvt": "4.0.0-beta.2",
+    "husky": "^3.0.4",
+    "mvt": "4.0.0",
     "rollup": "npm:rollup@latest",
     "rollup100": "npm:rollup@1.0.x",
     "rollup60": "npm:rollup@0.60.x",
-    "standard": "^13.0.2"
+    "standard": "^14.0.2"
   },
   "dependencies": {}
 }

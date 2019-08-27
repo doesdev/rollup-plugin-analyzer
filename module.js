@@ -17,15 +17,15 @@ const match = (str, check) => str.indexOf(check) !== -1
 export const reporter = (analysis, opts) => {
   const { hideDeps, root, showExports, summaryOnly } = opts || {}
 
-  let formatted = `` +
+  let formatted = '' +
     `${borderX}` +
-    `Rollup File Analysis\n` +
+    'Rollup File Analysis\n' +
     `${borderX}` +
     `bundle size:    ${formatBytes(analysis.bundleSize)}\n` +
     `original size:  ${formatBytes(analysis.bundleOrigSize)}\n` +
     `code reduction: ${analysis.bundleReduction} %\n` +
     `module count:   ${analysis.moduleCount}\n` +
-    `\n`
+    '\n'
 
   analysis.modules.forEach((m, i) => {
     const id = m.id.replace(/\\/g, '/')
@@ -39,7 +39,7 @@ export const reporter = (analysis, opts) => {
     const summaryBar = `${id}\n${rawBar} ${m.percent} % (${size})`
     const bar = !summaryOnly ? rawBar : summaryBar
 
-    formatted += summaryOnly ? `${bar}\n` : `` +
+    formatted += summaryOnly ? `${bar}\n` : '' +
       `${bar}\n` +
       `file:           ${buf}${id}\n` +
       `bundle space:   ${buf}${m.percent} %\n` +
@@ -65,7 +65,7 @@ export const reporter = (analysis, opts) => {
       })
     }
 
-    formatted += summaryOnly ? '' : `\n`
+    formatted += summaryOnly ? '' : '\n'
   })
 
   return formatted
@@ -154,10 +154,10 @@ export const plugin = (opts = {}) => {
     buildStart: function () {
       const ctx = this || {}
       if (!ctx.meta || +(ctx.meta.rollupVersion || 0).charAt(0) < 1) {
-        const msg = `` +
+        const msg = '' +
           `rollup-plugin-analyzer: Rollup version not supported\n${tab}` +
           `Starting with 3.0.0 only Rollup >= 1.0.0 is supported\n${tab}` +
-          `Use rollup-plugin-analyzer 2.1.0 for prior Rollup versions`
+          'Use rollup-plugin-analyzer 2.1.0 for prior Rollup versions'
         console.error(msg)
       }
     },
