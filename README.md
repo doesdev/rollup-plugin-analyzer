@@ -27,10 +27,20 @@ $ npm install --save-dev rollup-plugin-analyzer
 
 ## Usage
 
-### from rollup config
+### Importing or Requiring
+
+#### Import as ES Module
 ```js
 import analyze from 'rollup-plugin-analyzer'
+```
 
+#### Requiring as CJS
+```js
+const analyze = require('rollup-plugin-analyzer')
+```
+
+### Usage from rollup config
+```js
 export default {
   entry: 'module.js',
   dest: 'index.js',
@@ -39,11 +49,8 @@ export default {
 }
 ```
 
-### from build script
+### Usage from build script
 ```js
-import { rollup } from 'rollup'
-import analyze from 'rollup-plugin-analyzer'
-
 rollup({
   entry: 'main.js',
   plugins: [analyze()]
@@ -52,11 +59,9 @@ rollup({
 
 ### CI usage example
 ```js
-import { rollup } from 'rollup'
-import analyze from 'rollup-plugin-analyzer'
 const limitBytes = 1e6
 
-const onAnalysis = ({bundleSize}) => {
+const onAnalysis = ({ bundleSize }) => {
   if (bundleSize < limitBytes) return
   console.log(`Bundle size exceeds ${limitBytes} bytes: ${bundleSize} bytes`)
   return process.exit(1)
@@ -64,7 +69,7 @@ const onAnalysis = ({bundleSize}) => {
 
 rollup({
   entry: 'main.js',
-  plugins: [analyze({onAnalysis, skipFormatted: true})]
+  plugins: [analyze({ onAnalysis, skipFormatted: true })]
 }).then(...)
 ```
 

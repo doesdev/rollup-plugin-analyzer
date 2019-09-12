@@ -36,6 +36,14 @@ const rollers = [
   { rollup: rollup100, version: '1.0.x', opts: baseOpts }
 ]
 
+test('require signature works destructured, direct, and as .default', (assert) => {
+  const { plugin: destructured } = require('./../index')
+  const direct = require('./../index')
+  assert.true(typeof destructured === 'function')
+  assert.true(typeof direct === 'function')
+  assert.true(typeof direct.default === 'function')
+})
+
 // main
 rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
   test(`${version}: formatted returns expected string`, async (assert) => {

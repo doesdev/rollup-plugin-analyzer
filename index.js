@@ -187,4 +187,6 @@ const plugin = (opts = {}) => {
 
 Object.assign(plugin, { plugin, analyze, formatted, reporter });
 
+plugin.default = plugin;
+
 module.exports = plugin;

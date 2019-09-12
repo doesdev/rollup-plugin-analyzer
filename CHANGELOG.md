@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+### [3.2.1](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.0...3.2.1)
+
+> 12 September 2019
+
+- Explicitly add `.default` property to `plugin` in CJS output
+- Because my previous unbreaking change broke things
+- Clarify import and require usage in README
+
 ### [3.2.0](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.1.2...3.2.0)
 
 > 12 September 2019
