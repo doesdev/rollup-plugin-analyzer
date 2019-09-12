@@ -2,8 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-### Unreleased
+### [3.2.0](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.1.2...3.2.0)
 
+> 12 September 2019
+
+- [SHOULD NOT BE BREAKING] Correct export signature in module.js
+  - This, while an API change, should not be a breaking change
+  - Previously the export signature when used as a module was a bit effed
+  - This should fix that
+  - To my knowledge and in my tests that should not break things
 - Update yarn lockfile using latest Rollup version
 - Correct path to latest Rollup version under scripts
 - Remove `changelog` script (manually maintain changelog, tis better this way)

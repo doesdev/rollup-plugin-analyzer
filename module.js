@@ -14,7 +14,7 @@ const formatBytes = (bytes) => {
 const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0)
 const match = (str, check) => str.indexOf(check) !== -1
 
-export const reporter = (analysis, opts) => {
+const reporter = (analysis, opts) => {
   const { hideDeps, root, showExports, summaryOnly } = opts || {}
 
   let formatted = '' +
@@ -127,21 +127,21 @@ const analyzer = (bundle, opts = {}) => {
   return { bundleSize, bundleOrigSize, bundleReduction, modules, moduleCount }
 }
 
-export const analyze = (bundle, opts) => new Promise((resolve, reject) => {
+const analyze = (bundle, opts) => new Promise((resolve, reject) => {
   try {
     const analysis = analyzer(bundle, opts)
     return resolve(analysis)
   } catch (ex) { return reject(ex) }
 })
 
-export const formatted = (bundle, opts) => new Promise((resolve, reject) => {
+const formatted = (bundle, opts) => new Promise((resolve, reject) => {
   try {
     const analysis = analyzer(bundle, opts)
     return resolve(reporter(analysis, opts))
   } catch (ex) { return resolve(ex.toString()) }
 })
 
-export const plugin = (opts = {}) => {
+const plugin = (opts = {}) => {
   const writeTo = opts.writeTo || (opts.stdout ? console.log : console.error)
 
   const onAnalysis = (analysis) => {

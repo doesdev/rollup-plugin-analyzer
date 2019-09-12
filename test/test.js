@@ -262,7 +262,7 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
   }
 })
 
-test(`rollup < 1.0.0 prints warning about support`, async (assert) => {
+test('rollup < 1.0.0 prints warning about support', async (assert) => {
   let results = ''
   const oldCslErr = console.error
   console.error = (...args) => {
@@ -271,7 +271,7 @@ test(`rollup < 1.0.0 prints warning about support`, async (assert) => {
   const rollOpts = Object.assign({ plugins: [plugin()] }, baseOpts)
   const bundle = await rollup60(rollOpts)
   await bundle.generate({ format: 'cjs' })
-  const expect = `rollup-plugin-analyzer: Rollup version not supported`
+  const expect = 'rollup-plugin-analyzer: Rollup version not supported'
   assert.is(results.split('\n')[0], expect)
   console.error = oldCslErr
 })

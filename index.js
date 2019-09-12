@@ -1,7 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 const buf = ' ';
 const tab = '  ';
 const borderX = `${Array(30).join('-')}\n`;
@@ -189,8 +187,4 @@ const plugin = (opts = {}) => {
 
 Object.assign(plugin, { plugin, analyze, formatted, reporter });
 
-exports.analyze = analyze;
-exports.default = plugin;
-exports.formatted = formatted;
-exports.plugin = plugin;
-exports.reporter = reporter;
+module.exports = plugin;
