@@ -10,8 +10,9 @@
     "module.js"
   ],
   "scripts": {
-    "test": "standard module.js && node ./node_modules/rollup/dist/bin/rollup -c && mvt --verbose",
-    "precommit": "standard module.js && node ./node_modules/rollup/dist/bin/rollup -c && mvt --verbose && git add index.js"
+    "build": "standard module.js && node ./node_modules/rollup/dist/bin/rollup -c",
+    "test": "yarn run build && node test/test.js --verbose",
+    "precommit": "yarn run build && node test/test.js && git add index.js"
   },
   "repository": {
     "type": "git",
