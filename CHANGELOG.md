@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+### UNRELEASED
+
+- Cleanup npm scripts
+
 ### [3.2.1](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.0...3.2.1)
 
 > 12 September 2019

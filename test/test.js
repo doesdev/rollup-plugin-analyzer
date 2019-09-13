@@ -8,7 +8,7 @@ const { rollup: rollup60 } = require('rollup60')
 const { rollup: rollup100 } = require('rollup100')
 
 const skipFormatted = true
-const fixtures = resolvePath(__dirname, 'fixtures')
+const fixtures = resolvePath(__dirname, '_fixtures')
 const importA = 'the-declaration-of-independence'
 const importB = 'the-alphabet-but-incomplete'
 
