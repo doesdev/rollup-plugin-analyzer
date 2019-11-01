@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. Dates are d
 
 ### UNRELEASED
 
+### [3.2.2](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.1...3.2.2)
+
+> 1 November 2019
+
+- Hack: Coalesce bundleMods
+- Update dev deps
+
 ### [3.2.1](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.0...3.2.1)
 
 > 12 September 2019

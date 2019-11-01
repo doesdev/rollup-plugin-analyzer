@@ -173,6 +173,7 @@ const plugin = (opts = {}) => {
 
         const modules = []
         Object.entries(bundle).forEach(([outId, { modules: bundleMods }]) => {
+          bundleMods = bundleMods || {}
           Object.entries(bundleMods).forEach(([id, moduleInfo]) => {
             const dependencies = getDeps(id)
             modules.push(Object.assign({}, moduleInfo, { id, dependencies }))
