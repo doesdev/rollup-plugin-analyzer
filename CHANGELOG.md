@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. Dates are d
 
 ### UNRELEASED
 
+### [3.2.3](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.2...3.2.3)
+
+> 13 May 2020
+
+- [https://github.com/doesdev/rollup-plugin-analyzer/pull/17](Add TS declarations)
+- Update lockfile
+
 ### [3.2.2](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.1...3.2.2)
 
 > 1 November 2019
