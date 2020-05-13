@@ -2,11 +2,14 @@
   "name": "rollup-plugin-analyzer",
   "version": "3.2.2",
   "description": "Mad metrics for your rollup bundles, know all the things",
-  "engines" : { "node" : ">=8.0.0" },
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "main": "index.js",
   "module": "module.js",
   "files": [
     "index.js",
+    "index.d.ts",
     "module.js"
   ],
   "scripts": {
