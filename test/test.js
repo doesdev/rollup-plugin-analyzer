@@ -4,7 +4,6 @@ const test = require('mvt')
 const { analyze, formatted, plugin } = require('./../index')
 const { resolve: resolvePath, join, basename } = require('path')
 const { rollup: rollupLatest } = require('rollup')
-const { rollup: rollup60 } = require('rollup60')
 const { rollup: rollup100 } = require('rollup100')
 
 const skipFormatted = true
@@ -15,11 +14,6 @@ const importB = 'the-alphabet-but-incomplete'
 const baseOpts = {
   input: join(fixtures, 'bundle-a.js'),
   output: { format: 'cjs' }
-}
-
-const multiInputOpts = {
-  input: [join(fixtures, 'bundle-a.js'), join(fixtures, 'bundle-b.js')],
-  output: { format: 'cjs', dir: join(fixtures, 'multi') }
 }
 
 const expectHeader = `
@@ -64,12 +58,17 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.truthy('bundleSize' in result)
     assert.truthy('bundleOrigSize' in result)
     assert.truthy('bundleReduction' in result)
+    assert.truthy('moduleCount' in result)
     assert.truthy('modules' in result)
     const firstModule = result.modules[0]
     assert.truthy('id' in firstModule)
     assert.truthy('size' in firstModule)
+    assert.truthy('origSize' in firstModule)
     assert.truthy('dependents' in firstModule)
     assert.truthy('percent' in firstModule)
+    assert.truthy('reduction' in firstModule)
+    assert.truthy('renderedExports' in firstModule)
+    assert.truthy('removedExports' in firstModule)
   })
 
   test(`${version}: limit works`, async (assert) => {
@@ -144,6 +143,18 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     const bundle = await rollup(rollOpts)
     await bundle.generate({ format: 'cjs' })
     assert.is(results.substr(0, expectHeader.length), expectHeader)
+    assert.contains(results, 'bundle size:')
+    assert.contains(results, 'original size:')
+    assert.contains(results, 'code reduction:')
+    assert.contains(results, 'module count:')
+    assert.contains(results, 'file:')
+    assert.contains(results, 'bundle space:')
+    assert.contains(results, 'rendered size:')
+    assert.contains(results, 'original size:')
+    assert.contains(results, 'code reduction:')
+    assert.contains(results, 'dependents:')
+    assert.contains(results, 'used exports:')
+    assert.contains(results, 'unused exports:')
   })
 
   test(`${version}: summaryOnly bar graphs as expected`, async (assert) => {
@@ -190,57 +201,8 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.is(results.length, 1)
   })
 
-  if (version === '0.60.x') {
-    const split1 = `${version}: writes expected heading with experimentalCodeSplitting`
-    test(split1, async (assert) => {
-      let results
-      const writeTo = (r) => { results = r }
-      const rollOpts = Object.assign(
-        { plugins: [plugin({ writeTo })] },
-        multiInputOpts
-      )
-      rollOpts.experimentalCodeSplitting = true
-      const bundle = await rollup(rollOpts)
-      await bundle.generate({ format: 'cjs' })
-      assert.is(results.substr(0, expectHeader.length), expectHeader)
-    })
-
-    const split2 = `${version}: data as expected with experimentalCodeSplitting`
-    test(split2, async (assert) => {
-      const results = []
-      const onAnalysis = (r) => { results.push(r.modules) }
-      const plugins = [plugin({ onAnalysis, skipFormatted })]
-      const rollOpts = Object.assign({}, multiInputOpts, { plugins })
-      rollOpts.experimentalCodeSplitting = true
-      const bundle = await rollup(rollOpts)
-      await bundle.write(rollOpts.output)
-
-      const imports = [{ id: importA, size: 8238 }, { id: importB, size: 33 }]
-      imports.forEach((imp, i) => {
-        const result = results[i]
-        const imported = result.find((r) => r.id.indexOf(imp.id) !== -1)
-        assert.truthy(Math.abs(imported.size - imp.size) < 5)
-      })
-    })
-
-    test.failing(`${version}: callback is only invoked once`, async (assert) => {
-      let count = 0
-      const writeTo = () => ++count
-
-      const rollOpts = Object.assign(
-        { plugins: [plugin({ writeTo })] },
-        multiInputOpts
-      )
-      rollOpts.experimentalCodeSplitting = true
-      const bundle = await rollup(rollOpts)
-      await bundle.generate({ format: 'cjs' })
-
-      assert.is(count, 1)
-    })
-  }
-
   if (version === 'latest') {
-    test(`${version}: plugin shouldn't cause much overhead`, async (assert) => {
+    test(`${version}: plugin shouldn't slow down build`, async (assert) => {
       let start
       const runs = 20
       const msDiffThreshold = 50
@@ -268,18 +230,4 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
       assert.truthy((withPlugin - noPlugin) < msDiffThreshold)
     })
   }
-})
-
-test('rollup < 1.0.0 prints warning about support', async (assert) => {
-  let results = ''
-  const oldCslErr = console.error
-  console.error = (...args) => {
-    results += args.join()
-  }
-  const rollOpts = Object.assign({ plugins: [plugin()] }, baseOpts)
-  const bundle = await rollup60(rollOpts)
-  await bundle.generate({ format: 'cjs' })
-  const expect = 'rollup-plugin-analyzer: Rollup version not supported'
-  assert.is(results.split('\n')[0], expect)
-  console.error = oldCslErr
 })

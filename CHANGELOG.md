@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
 ### UNRELEASED
+- Remove Rollup 0.60.0 from tests
+- Fix incorrect key names in `analysisObject` docs
+- Clarify `filter` usage
+- Update dev deps
 
 ### [3.2.3](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.2...3.2.3)
 

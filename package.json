@@ -47,12 +47,11 @@
   },
   "homepage": "http://rollup-plugin-analyzer.doesdev.com/",
   "devDependencies": {
-    "husky": "^4.2.3",
+    "husky": "^4.2.5",
     "mvt": "4.1.0",
     "rollup": "npm:rollup@latest",
     "rollup100": "npm:rollup@1.0.x",
-    "rollup60": "npm:rollup@0.60.x",
-    "standard": "^14.3.3"
+    "standard": "^14.3.4"
   },
   "dependencies": {}
 }

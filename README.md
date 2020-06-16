@@ -148,7 +148,11 @@ module count:   5
   - type: Array | String | Function
   - default: `null`
   - description: Filter module to output in analysis results.
-    - If a string is passed, checks if module name contains the string. If array it checks the same for each string in the array. If function, return a boolean to indicate if a module should be in analysis results.
+    - If a string is passed, checks if module name contains the string
+    - If array it checks the same for each string in the array
+    - If function, return a boolean to indicate if a module should be in analysis results
+    - This only suppresses the modules details, it does not affect the summary output
+    - If you would like it to filter from summary info as well, let us know in [#19](https://github.com/doesdev/rollup-plugin-analyzer/issues/19)
   - notes: Function receives `module` object specified below, should return boolean
 - **root** - *optional*
   - type: String
@@ -203,8 +207,8 @@ module count:   5
           - **dependents** *(Array)* - list of dependent module ids / paths
           - **percent** *(Number)* - percentage of module size relative to entire bundle
           - **reduction** *(Number)* - percentage of rendered size reduction
-          - **usedExports** *(Array)* - list of used named exports
-          - **unusedExports** *(Array)* - list of unused named exports
+          - **renderedExports** *(Array)* - list of used named exports
+          - **removedExports** *(Array)* - list of unused named exports
 
 ## Other considerations
 
