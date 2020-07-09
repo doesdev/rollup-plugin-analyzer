@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-### UNRELEASED
+### [3.3.0](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.3...3.3.0)
+
+> 8 July 2020
+
+- Add `filterSummary` option (#19 && #20)
+- Fix `origSize`, `bundleOrigSize`, and `bundleReduction` (was apparently borked)
 - Remove Rollup 0.60.0 from tests
 - Fix incorrect key names in `analysisObject` docs
 - Clarify `filter` usage

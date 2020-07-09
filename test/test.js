@@ -104,6 +104,22 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.is((await analyze(bundle, { filter: hasMatch })).modules.length, 1)
   })
 
+  test(`${version}: filterSummary with string works`, async (assert) => {
+    const bundle = await rollup(opts)
+    const filter = 'jimmy'
+    const whenFalse = await analyze(bundle, { filter })
+    const whenTrue = await analyze(bundle, { filter, filterSummary: true })
+
+    assert.is(whenFalse.moduleCount, 5)
+    assert.is(whenTrue.moduleCount, 0)
+
+    assert.true(Math.abs(whenFalse.bundleSize - 11436) < 5)
+    assert.is(whenTrue.bundleSize, 0)
+
+    assert.true(Math.abs(whenFalse.bundleOrigSize - 11436) < 5)
+    assert.is(whenTrue.bundleOrigSize, 0)
+  })
+
   test(`${version}: transformModuleId works`, async (assert) => {
     const bundle = await rollup(opts)
     const transformModuleId = (id) => `transformed-${basename(id)}`
@@ -186,7 +202,7 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     await bundle.write(output)
     const imported = results.find((r) => r.id.indexOf(importA) !== -1)
     const expectSize = 27
-    assert.truthy(Math.abs(imported.size - expectSize) < 5)
+    assert.true(Math.abs(imported.size - expectSize) < 5)
   })
 
   test(`${version}: treeshaken bundle filters with callback`, async (assert) => {

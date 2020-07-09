@@ -152,8 +152,12 @@ module count:   5
     - If array it checks the same for each string in the array
     - If function, return a boolean to indicate if a module should be in analysis results
     - This only suppresses the modules details, it does not affect the summary output
-    - If you would like it to filter from summary info as well, let us know in [#19](https://github.com/doesdev/rollup-plugin-analyzer/issues/19)
+    - If you would like it to filter from summary info as well set `filterSummary` to `true`
   - notes: Function receives `module` object specified below, should return boolean
+- **filterSummary** - *optional*
+  - type: Boolean
+  - default: `false`
+  - description: If `true` the `filter` option will also remove any filtered out module data from the summary
 - **root** - *optional*
   - type: String
   - default: `process.cwd()`

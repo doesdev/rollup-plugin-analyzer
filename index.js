@@ -3,6 +3,7 @@
 const buf = ' ';
 const tab = '  ';
 const borderX = `${Array(30).join('-')}\n`;
+
 const formatBytes = (bytes) => {
   if (bytes === 0) return '0 Byte'
   const k = 1000;
@@ -11,8 +12,24 @@ const formatBytes = (bytes) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 };
-const shakenPct = (n, o) => Math.max((100 - ((n / o) * 100)).toFixed(2), 0);
+
+const shakenPct = (n = 0, o = 0) => {
+  const pct = Math.max((100 - ((n / o) * 100)).toFixed(2), 0);
+  return Number.isNaN(pct) ? 0 : pct
+};
+
 const match = (str, check) => str.indexOf(check) !== -1;
+
+const sizeOrCodeSize = (size, code) => {
+  if (size || size === 0) return size
+  return code ? Buffer.byteLength(code, 'utf8') : 0
+};
+
+const filterByType = {
+  function: (filter, m) => filter(m),
+  array: (filter, m) => filter.some((f) => match(m.id, f)),
+  string: (filter, m) => match(m.id, filter)
+};
 
 const reporter = (analysis, opts) => {
   const { hideDeps, root, showExports, summaryOnly } = opts || {};
@@ -72,57 +89,67 @@ const reporter = (analysis, opts) => {
 };
 
 const analyzer = (bundle, opts = {}) => {
-  const { limit, filter } = opts;
-  let { root, transformModuleId } = opts;
-  root = root || (process && process.cwd ? process.cwd() : null);
-  if (typeof transformModuleId !== 'function') transformModuleId = undefined;
-
-  const deps = {};
+  const { limit, filter, transformModuleId, filterSummary } = opts;
+  const root = opts.root || (process && process.cwd ? process.cwd() : null);
+  const idMod = typeof transformModuleId === 'function' && transformModuleId;
+  const filterType = Array.isArray(filter) ? 'array' : typeof filter;
+  const applyFilter = filterByType[filterType];
   const bundleModules = bundle.modules || (bundle.cache || {}).modules || [];
-  const moduleCount = bundleModules.length;
+  const deps = {};
 
+  let tmpBdlSize = 0;
   let bundleSize = 0;
   let bundleOrigSize = 0;
 
   let modules = bundleModules.map((m, i) => {
+    const id = idMod ? idMod(m.id.replace(root, '')) : m.id.replace(root, '');
     const {
-      originalLength: origSize,
+      originalLength,
       renderedLength,
-      code,
       renderedExports,
-      removedExports
+      removedExports,
+      originalCode,
+      code
     } = m;
-    let { id } = m;
-    id = id.replace(root, '');
-    if (transformModuleId) id = transformModuleId(id);
-    let size = renderedLength;
-    if (!size && size !== 0) size = code ? Buffer.byteLength(code, 'utf8') : 0;
-    bundleSize += size;
-    bundleOrigSize += origSize;
 
-    if (Array.isArray(filter) && !filter.some((f) => match(id, f))) return null
-    if (typeof filter === 'string' && !match(id, filter)) return null
+    const size = sizeOrCodeSize(renderedLength, code);
+    const origSize = sizeOrCodeSize(originalLength, originalCode);
+
+    tmpBdlSize += size;
 
     m.dependencies.forEach((d) => {
-      d = d.replace(root, '');
-      if (transformModuleId) d = transformModuleId(d);
+      d = idMod ? idMod(d.replace(root, '')) : d.replace(root, '');
       deps[d] = deps[d] || [];
       deps[d].push(id);
     });
 
     return { id, size, origSize, renderedExports, removedExports }
+  }).filter((m) => m).sort((a, b) => b.size - a.size);
+
+  if (limit || limit === 0) modules = modules.slice(0, limit);
+
+  modules = modules.map((m) => {
+    m.dependents = deps[m.id] || [];
+    m.percent = Math.min(((m.size / tmpBdlSize) * 100).toFixed(2), 100);
+    m.reduction = shakenPct(m.size, m.origSize);
+
+    const filtered = applyFilter && !applyFilter(filter, m);
+    if (filtered && filterSummary) return null
+
+    bundleSize += m.size;
+    bundleOrigSize += m.origSize;
+
+    return filtered ? null : m
   }).filter((m) => m);
 
-  modules.sort((a, b) => b.size - a.size);
-  if (limit || limit === 0) modules = modules.slice(0, limit);
-  modules.forEach((m) => {
-    m.dependents = deps[m.id] || [];
-    m.percent = Math.min(((m.size / bundleSize) * 100).toFixed(2), 100);
-    m.reduction = shakenPct(m.size, m.origSize);
-  });
-  if (typeof filter === 'function') modules = modules.filter(filter);
+  if (filterSummary) {
+    modules.forEach((m) => {
+      m.percent = Math.min(((m.size / bundleSize) * 100).toFixed(2), 100);
+    });
+  }
 
   const bundleReduction = shakenPct(bundleSize, bundleOrigSize);
+  const moduleCount = (filterSummary ? modules : bundleModules).length;
 
   return { bundleSize, bundleOrigSize, bundleReduction, modules, moduleCount }
 };
