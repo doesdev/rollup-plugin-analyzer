@@ -1,4 +1,6 @@
-# rollup-plugin-analyzer [![NPM version](https://badge.fury.io/js/rollup-plugin-analyzer.svg)](https://npmjs.org/package/rollup-plugin-analyzer)   [![Code Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)   [![Build Status](https://travis-ci.com/doesdev/rollup-plugin-analyzer.svg)](https://travis-ci.com/doesdev/rollup-plugin-analyzer)   ![Supported Node Versions](https://img.shields.io/node/v/rollup-plugin-analyzer)
+# rollup-plugin-analyzer
+
+[![npm](https://img.shields.io/npm/v/rollup-plugin-analyzer?style=for-the-badge)](https://npmjs.org/package/rollup-plugin-analyzer)   [![Travis (.com)](https://img.shields.io/travis/com/doesdev/rollup-plugin-analyzer?style=for-the-badge)](https://travis-ci.com/doesdev/rollup-plugin-analyzer)   [![Dependents (via libraries.io)](https://img.shields.io/librariesio/dependents/npm/rollup-plugin-analyzer?style=for-the-badge)](https://github.com/doesdev/rollup-plugin-analyzer/network/dependents)   [![npm](https://img.shields.io/npm/dm/rollup-plugin-analyzer?style=for-the-badge)](https://npmcharts.com/compare/rollup-plugin-analyzer?minimal=true&interval=7)
 
 > Mad metrics for your rollup bundles, know all the things
 
@@ -7,17 +9,6 @@
 See what's bloating your bundle, how treeshaking has treated you, and other
 great stuff. Perfect for console printing an analysis of your bundle or
 integrating in your CI workflows.
-
-### Comes in two scrumptious flavors:
-
-#### [rollup-plugin-analyzer](https://github.com/doesdev/rollup-plugin-analyzer)
-Adding as a plugin to your rollup config or build script will allow you to
-print a well formatted analysis to the console upon bundling or get a full
-analysis object for CI purposes.
-
-#### [rollup-config-analyzer](https://github.com/doesdev/rollup-config-analyzer)
-If using Rollup's CLI to bundle with no additional config, pass
-`-c node:rollup-config-analyzer` to print a well formatted analysis to your console.
 
 ## Install
 
