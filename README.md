@@ -1,8 +1,8 @@
 # rollup-plugin-analyzer
 
-[![npm](https://img.shields.io/npm/v/rollup-plugin-analyzer?style=for-the-badge)](https://npmjs.org/package/rollup-plugin-analyzer)   [![Travis (.com)](https://img.shields.io/travis/com/doesdev/rollup-plugin-analyzer?style=for-the-badge)](https://travis-ci.com/doesdev/rollup-plugin-analyzer)   [![Dependents (via libraries.io)](https://img.shields.io/librariesio/dependents/npm/rollup-plugin-analyzer?style=for-the-badge)](https://github.com/doesdev/rollup-plugin-analyzer/network/dependents)   [![npm](https://img.shields.io/npm/dm/rollup-plugin-analyzer?style=for-the-badge)](https://npmcharts.com/compare/rollup-plugin-analyzer?minimal=true&interval=7)
-
 > Mad metrics for your rollup bundles, know all the things
+
+[![npm](https://img.shields.io/npm/v/rollup-plugin-analyzer?style=for-the-badge)](https://npmjs.org/package/rollup-plugin-analyzer)   [![Travis (.com)](https://img.shields.io/travis/com/doesdev/rollup-plugin-analyzer?style=for-the-badge)](https://travis-ci.com/doesdev/rollup-plugin-analyzer)   [![Dependents (via libraries.io)](https://img.shields.io/librariesio/dependents/npm/rollup-plugin-analyzer?style=for-the-badge)](https://github.com/doesdev/rollup-plugin-analyzer/network/dependents)   [![npm](https://img.shields.io/npm/dm/rollup-plugin-analyzer?style=for-the-badge)](https://npmcharts.com/compare/rollup-plugin-analyzer?minimal=true&interval=7)
 
 ## rollup-plugin-analyzer
 
