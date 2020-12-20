@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+### [4.0.0](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.3.0...4.0.0)
+
+> 19 December 2020
+
+- **[BREAKING]** Limit does not affect summary (unless `filterSummary === true`)
+- [DEV] Update dev dependencies (standard, husky)
+- [DEV] Fix standard style issue
+- [DOCS] Add FAQ to readme
+- [DOCS] Add TOC to readme
+
 ### [3.3.0](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.2.3...3.3.0)
 
 > 8 July 2020

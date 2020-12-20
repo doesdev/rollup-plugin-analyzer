@@ -78,6 +78,32 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.is((await analyze(bundle, { limit: 0 })).modules.length, 0)
   })
 
+  test(`${version}: limit does not affect summary by default`, async (assert) => {
+    let results
+    const writeTo = (r) => { results = r }
+    const rollOpts = Object.assign(
+      { plugins: [plugin({ writeTo, limit: 0 })] },
+      opts
+    )
+    const bundle = await rollup(rollOpts)
+    await bundle.generate({ format: 'cjs' })
+
+    assert.doesNotContain(results, '0 Byte')
+  })
+
+  test(`${version}: limit respects filterSummary`, async (assert) => {
+    let results
+    const writeTo = (r) => { results = r }
+    const rollOpts = Object.assign(
+      { plugins: [plugin({ writeTo, limit: 0, filterSummary: true })] },
+      opts
+    )
+    const bundle = await rollup(rollOpts)
+    await bundle.generate({ format: 'cjs' })
+
+    assert.contains(results, '0 Byte')
+  })
+
   test(`${version}: filter with array works`, async (assert) => {
     const bundle = await rollup(opts)
     assert.is(

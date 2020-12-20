@@ -4,11 +4,21 @@
 
 [![npm](https://img.shields.io/npm/v/rollup-plugin-analyzer?style=for-the-badge)](https://npmjs.org/package/rollup-plugin-analyzer)   [![Travis (.com)](https://img.shields.io/travis/com/doesdev/rollup-plugin-analyzer?style=for-the-badge)](https://travis-ci.com/doesdev/rollup-plugin-analyzer)   [![Dependents (via libraries.io)](https://img.shields.io/librariesio/dependents/npm/rollup-plugin-analyzer?style=for-the-badge)](https://github.com/doesdev/rollup-plugin-analyzer/network/dependents)   [![npm](https://img.shields.io/npm/dm/rollup-plugin-analyzer?style=for-the-badge)](https://npmcharts.com/compare/rollup-plugin-analyzer?minimal=true&interval=7)
 
-## rollup-plugin-analyzer
+## TOC
 
-See what's bloating your bundle, how treeshaking has treated you, and other
-great stuff. Perfect for console printing an analysis of your bundle or
-integrating in your CI workflows.
+- [Install](#install)
+- [Usage](#usage)
+  + [Importing or Requiring](#importing-or-requiring)
+    - [Import as ES Module](#import-as-es-module)
+    - [Requiring as CJS](#requiring-as-cjs)
+  + [Usage from rollup config](#usage-from-rollup-config)
+  + [Usage from build script](#usage-from-build-script)
+  + [CI usage example](#ci-usage-example)
+  + [Example results](#results)
+  + [Example results (with `summaryOnly` enabled)](#results--with--summaryonly--enabled-)
+- [Options](#options)
+- [FAQ](#faq)
+- [License](#license)
 
 ## Install
 
@@ -148,7 +158,7 @@ module count:   5
 - **filterSummary** - *optional*
   - type: Boolean
   - default: `false`
-  - description: If `true` the `filter` option will also remove any filtered out module data from the summary
+  - description: If `true` the `filter` and `limit` options will also remove any filtered out module data from the summary
 - **root** - *optional*
   - type: String
   - default: `process.cwd()`
@@ -205,11 +215,19 @@ module count:   5
           - **renderedExports** *(Array)* - list of used named exports
           - **removedExports** *(Array)* - list of unused named exports
 
-## Other considerations
+## FAQ
 
-Rollup allows you to output to multiple files. If you are outputting to multiple
-files you will get a distinct analysis for each output file. Each analysis
-will contain data on the files imported by the respective target.
+#### Why is the reported size not the same as the file on disk?
+
+This module is geared towards the details of the individual modules that make up the bundle and their relative impact to bundle size. That's a detailed way of saying, it doesn't really care about size on disk. There are other options which focus on size on disk as well as delivery size which can be used alongside this module (or in place of if your concern is not per module impact). In particular [rollup-plugin-size-snapshot](https://github.com/TrySound/rollup-plugin-size-snapshot) seems like a great option for that.
+
+Getting a bit further into the details, rather than just intent, of why the reported size differs from that on disk. We get the module data from Rollup which reports it after chunk (module) resolution and tree-shaking, but before post-processing (such as minification and compression). We then add the sizes of each of those modules together, this is the `bundle size` that we report.
+
+That means it won't account for post-processing from other plugins and also won't account for post-processing by Rollup itself, which includes boilerplate / shims depending on what the output format is (CJS, ESM, iife, etc...).
+
+#### Why am I seeing multiple analysis outputs emitted?
+
+Rollup allows you to output to multiple files. If you are outputting to multiple files you will get a distinct analysis for each output file. Each analysis will contain data on the files imported by the respective target.
 
 ## License
 

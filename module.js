@@ -56,7 +56,7 @@ const reporter = (analysis, opts) => {
     const summaryBar = `${id}\n${rawBar} ${m.percent} % (${size})`
     const bar = !summaryOnly ? rawBar : summaryBar
 
-    formatted += summaryOnly ? `${bar}\n` : '' +
+    const detailed = !summaryOnly && '' +
       `${bar}\n` +
       `file:           ${buf}${id}\n` +
       `bundle space:   ${buf}${m.percent} %\n` +
@@ -64,6 +64,8 @@ const reporter = (analysis, opts) => {
       `original size:  ${buf}${formatBytes(m.origSize || 'unknown')}\n` +
       `code reduction: ${buf}${m.reduction} %\n` +
       `dependents:     ${buf}${m.dependents.length}\n`
+
+    formatted += summaryOnly ? `${bar}\n` : detailed
 
     if (!hideDeps && !summaryOnly) {
       m.dependents.forEach((d) => {
@@ -126,20 +128,19 @@ const analyzer = (bundle, opts = {}) => {
     return { id, size, origSize, renderedExports, removedExports }
   }).filter((m) => m).sort((a, b) => b.size - a.size)
 
-  if (limit || limit === 0) modules = modules.slice(0, limit)
-
-  modules = modules.map((m) => {
+  modules = modules.map((m, i) => {
     m.dependents = deps[m.id] || []
     m.percent = Math.min(((m.size / tmpBdlSize) * 100).toFixed(2), 100)
     m.reduction = shakenPct(m.size, m.origSize)
 
     const filtered = applyFilter && !applyFilter(filter, m)
-    if (filtered && filterSummary) return null
+    const limited = !Number.isNaN(+limit) && i >= limit
+    if ((limited || filtered) && filterSummary) return null
 
     bundleSize += m.size
     bundleOrigSize += m.origSize
 
-    return filtered ? null : m
+    return (limited || filtered) ? null : m
   }).filter((m) => m)
 
   if (filterSummary) {
