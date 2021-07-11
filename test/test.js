@@ -4,7 +4,7 @@ const test = require('mvt')
 const { analyze, formatted, plugin } = require('./../index')
 const { resolve: resolvePath, join, basename } = require('path')
 const { rollup: rollupLatest } = require('rollup')
-const { rollup: rollup100 } = require('rollup100')
+const { rollup: rollup200 } = require('rollup200')
 
 const skipFormatted = true
 const fixtures = resolvePath(__dirname, '_fixtures')
@@ -27,7 +27,7 @@ const headerLength = expectHeader.length
 // test against many versions of rollup
 const rollers = [
   { rollup: rollupLatest, version: 'latest', opts: baseOpts },
-  { rollup: rollup100, version: '1.0.x', opts: baseOpts }
+  { rollup: rollup200, version: '2.0.x', opts: baseOpts }
 ]
 
 test('require signature works destructured, direct, and as .default', (assert) => {

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+### UNRELEASED
+
+> 10 July 2021
+
+- Update dev deps
+- Remove husky
+- Specify exports = default in rollup config
+- Add 2.0.x tests, remove 1.0.x tests
+
 ### [4.0.0](https://github.com/doesdev/rollup-plugin-analyzer/compare/3.3.0...4.0.0)
 
 > 19 December 2020

@@ -16,11 +16,6 @@
     "build": "standard module.js && node ./node_modules/rollup/dist/bin/rollup -c",
     "test": "yarn run build && node test/test.js --verbose"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn run build && node test/test.js && git add index.js"
-    }
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/doesdev/rollup-plugin-analyzer.git"
@@ -47,10 +42,9 @@
   },
   "homepage": "http://rollup-plugin-analyzer.doesdev.com/",
   "devDependencies": {
-    "husky": "^4.3.6",
-    "mvt": "4.1.1",
+    "mvt": "4.2.1",
     "rollup": "npm:rollup@latest",
-    "rollup100": "npm:rollup@1.0.x",
+    "rollup200": "npm:rollup@2.0.x",
     "standard": "^16.0.3"
   },
   "dependencies": {}

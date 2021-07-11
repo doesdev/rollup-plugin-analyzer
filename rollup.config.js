@@ -19,6 +19,7 @@ export default {
   input: 'module.js',
   output: {
     file: 'index.js',
-    format: 'cjs'
+    format: 'cjs',
+    exports: 'default'
   }
 }
