@@ -229,6 +229,39 @@ That means it won't account for post-processing from other plugins and also won'
 
 Rollup allows you to output to multiple files. If you are outputting to multiple files you will get a distinct analysis for each output file. Each analysis will contain data on the files imported by the respective target.
 
+One way to manipulate the number of reports in this scenario is through the `onAnalysis` callback option:
+
+```js
+// Track iterations over output files
+let analyzePluginIterations = 0;
+
+export default {
+  input: 'myIsomorphicModule.js',
+  output: [
+    {
+      name: 'myIsomorphicModule',
+      format: 'cjs',
+      entryFileNames: '[name].cjs'
+    },
+    {
+      name: 'myIsomorphicModule',
+      format: 'es',
+      entryFileNames: '[name].mjs'
+    }
+  ],
+  plugins: [
+    analyze({
+      onAnalysis: () => {
+        if (analyzePluginIterations > 0) {
+          throw ''; // We only want reports on the first output
+        }
+        analyzePluginIterations++;
+      }
+    })
+  ]
+}
+```
+
 ## License
 
 MIT © [Andrew Carpenter](https://github.com/doesdev)
