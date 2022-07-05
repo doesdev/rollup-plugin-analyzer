@@ -45,7 +45,7 @@
     "mvt": "4.2.1",
     "rollup": "npm:rollup@latest",
     "rollup200": "npm:rollup@2.66.x",
-    "standard": "^16.0.4"
+    "standard": "^17.0.0"
   },
   "dependencies": {}
 }
