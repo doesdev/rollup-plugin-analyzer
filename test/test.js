@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('mvt')
-const { analyze, formatted, plugin } = require('./../index')
+const { analyze, formatted, plugin, reporter } = require('./../index')
 const { resolve: resolvePath, join, basename } = require('path')
 const { rollup: rollupLatest } = require('rollup')
 const { rollup: rollup200 } = require('rollup200')
@@ -70,6 +70,30 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.truthy('renderedExports' in firstModule)
     assert.truthy('removedExports' in firstModule)
   })
+
+  test(`${version}: reporter shows kilobytes as 1024 bytes`, async (assert) => {    
+    const sizeKb = 10;
+    const origSizeKb = 12.82;
+
+    const report = reporter({
+      bundleSize: sizeKb * 1024,
+      bundleOrigSize: origSizeKb * 1024,
+      bundleReduction: 50,
+      modules: [],
+      moduleCount: 0
+    }, { format: 'json' })
+
+    assert.contains(report, 'bundle size:');
+    assert.contains(report, 'original size:');
+
+    const bundleSize = report.split('\n').find(line => line.includes('bundle size:'))
+    const originalSize = report.split('\n').find(line => line.includes('original size:'))
+
+    assert.contains(bundleSize, `${sizeKb} KB`);
+    assert.contains(originalSize, `${origSizeKb} KB`);
+
+  })
+
 
   test(`${version}: limit works`, async (assert) => {
     const bundle = await rollup(opts)
