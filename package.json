@@ -47,5 +47,5 @@
     "rollup200": "npm:rollup@2.66.x",
     "standard": "^17.0.0"
   },
-  "dependencies": {}
+  "packageManager": "yarn@3.5.1"
 }
