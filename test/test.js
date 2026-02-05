@@ -1,6 +1,4 @@
-'use strict'
-
-const test = require('mvt')
+const { default: test } = require('mvt')
 const { analyze, formatted, plugin, reporter } = require('./../index')
 const { resolve: resolvePath, join, basename } = require('path')
 const { rollup: rollupLatest } = require('rollup')
@@ -71,7 +69,7 @@ rollers.forEach(({ rollup, version, opts, noTreeshake }) => {
     assert.truthy('removedExports' in firstModule)
   })
 
-  test(`${version}: reporter shows kilobytes as 1024 bytes`, async (assert) => {    
+  test(`${version}: reporter shows kilobytes as 1024 bytes`, async (assert) => {
     const sizeKb = 10;
     const origSizeKb = 12.82;
 

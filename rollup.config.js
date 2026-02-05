@@ -1,6 +1,6 @@
 'use strict'
 
-import analyzer from './module'
+import analyzer from './module.js'
 
 const appendExportPlugin = () => {
   return {

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. Dates are d
 
 ### UNRELEASED
 
+> 05 February 2026
+
+- Update dev deps
+- Add peerDependency for rollup
+- Update mvt test require signature
+
 > 10 July 2021
 
 - Update dev deps
